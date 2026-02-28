@@ -1,0 +1,6 @@
+I need a json result of the form {risk: ""} where the result can be low, medium or high.
+This needs to be calculated off of the safety of everyone INSIDE of the water in the image
+if there is no water, simply have the risk be low.
+Focus on the age of the people swimming, changes of positions inside of the pool
+if there appears to be struggle or unusual behavior. just give me the JSON value,
+do not give me a single other piece of text as output.
