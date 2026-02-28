@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  Pressable,
 } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
@@ -226,17 +225,12 @@ export default function CameraFeedCard({
       <Modal
         visible={isFullscreen}
         animationType="fade"
-        transparent
+        statusBarTranslucent
         onRequestClose={() => setIsFullscreen(false)}
       >
-        <Pressable
-          style={styles.fullscreenBackdrop}
-          onPress={() => setIsFullscreen(false)}
-        >
-          <Pressable style={styles.fullscreenContent} onPress={() => {}}>
-            {renderPreview(true)}
-          </Pressable>
-        </Pressable>
+        <View style={styles.fullscreenBackdrop}>
+          {renderPreview(true)}
+        </View>
       </Modal>
     </>
   );
@@ -379,9 +373,6 @@ const styles = StyleSheet.create({
   },
   fullscreenBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.95)",
-  },
-  fullscreenContent: {
-    flex: 1,
+    backgroundColor: "#000000",
   },
 });
