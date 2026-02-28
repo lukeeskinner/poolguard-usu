@@ -43,9 +43,9 @@ def inference_loop():
         idx = (idx + 1) % camera.get_frame_count()
 
         result = next_frame(frame)
-        if result is None:
-            continue
-        print(result.image)
+        # if result is None:
+        #     continue
+        # print(result.image)
 
         img_bytes = base64.b64decode(result.image)
 

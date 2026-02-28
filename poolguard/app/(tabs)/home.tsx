@@ -9,7 +9,7 @@ import AddCameraButton from "@/components/cameras/AddCameraButton";
 import AICoverageTip from "@/components/cameras/AICoverageTip";
 
 // Update this to your server's local IP address (e.g. "http://192.168.1.42:5001")
-const SERVER_URL = "https://initial-warrant-jade-returns.trycloudflare.com";
+const SERVER_URL = "https://pasta-determination-controversy-bye.trycloudflare.com";
 
 const CAMERAS = [
   {

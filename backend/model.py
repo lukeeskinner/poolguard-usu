@@ -60,12 +60,12 @@ def next_frame(image_input) -> FrameResult:
         raise TypeError(f"Unsupported image type: {type(image_input)}")
 
     # 2. Skip near-identical frames (saves 70–90% of API calls in quiet scenes)
-    if _prev_raw_frame is not None and not _frame_changed(_prev_raw_frame, raw_frame):
-        print("⏭ Frame unchanged — skipping API call.")
-        # Return last cached result if available
-        if _frame_cache:
-            return next(reversed(_frame_cache.values()))
-    _prev_raw_frame = raw_frame
+    # if _prev_raw_frame is not None and not _frame_changed(_prev_raw_frame, raw_frame):
+    #     print("⏭ Frame unchanged — skipping API call.")
+    #     # Return last cached result if available
+    #     if _frame_cache:
+    #         return next(reversed(_frame_cache.values()))
+    # _prev_raw_frame = raw_frame
 
     # 3. Resize to max 640px wide (reduces payload 70–85% + faster inference)
     if image.width > MAX_WIDTH:
