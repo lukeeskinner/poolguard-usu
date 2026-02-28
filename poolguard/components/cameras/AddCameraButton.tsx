@@ -57,139 +57,142 @@ export default function AddCameraButton() {
         animationType="slide"
         onRequestClose={onClose}
       >
-        <KeyboardAvoidingView
-          style={styles.overlay}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-          <Pressable style={styles.backdrop} onPress={onClose} />
+        <View style={styles.overlay}>
+          {/* Tappable backdrop */}
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
-          <View style={styles.sheet}>
-            {/* Handle bar */}
-            <View style={styles.handle} />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={styles.sheetWrapper}
+          >
+            <View style={styles.sheet}>
+              {/* Handle bar */}
+              <View style={styles.handle} />
 
-            {/* Header */}
-            <View style={styles.header}>
-              <View style={styles.headerIcon}>
-                <Ionicons name="videocam" size={20} color={Colors.primary} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.headerTitle}>Add New Camera</Text>
-                <Text style={styles.headerSubtitle}>
-                  Enter your camera details below
-                </Text>
-              </View>
-              <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                <Ionicons name="close" size={20} color={Colors.textMuted} />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView
-              style={styles.form}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              {/* Camera Name */}
-              <Text style={styles.label}>Camera Name</Text>
-              <View style={styles.inputRow}>
-                <Ionicons
-                  name="camera-outline"
-                  size={18}
-                  color={Colors.textMuted}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. Pool South-West"
-                  placeholderTextColor={Colors.textMuted}
-                  value={name}
-                  onChangeText={setName}
-                  selectionColor={Colors.primary}
-                />
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={styles.headerIcon}>
+                  <Ionicons name="videocam" size={20} color={Colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.headerTitle}>Add New Camera</Text>
+                  <Text style={styles.headerSubtitle}>
+                    Enter your camera details below
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+                  <Ionicons name="close" size={20} color={Colors.textMuted} />
+                </TouchableOpacity>
               </View>
 
-              {/* IP Address */}
-              <Text style={styles.label}>IP Address</Text>
-              <View style={styles.inputRow}>
-                <Ionicons
-                  name="globe-outline"
-                  size={18}
-                  color={Colors.textMuted}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. 192.168.1.42"
-                  placeholderTextColor={Colors.textMuted}
-                  value={ip}
-                  onChangeText={setIp}
-                  keyboardType="decimal-pad"
-                  selectionColor={Colors.primary}
-                />
-              </View>
-
-              {/* Location */}
-              <Text style={styles.label}>Location</Text>
-              <View style={styles.inputRow}>
-                <Ionicons
-                  name="location-outline"
-                  size={18}
-                  color={Colors.textMuted}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. Backyard, Deep End"
-                  placeholderTextColor={Colors.textMuted}
-                  value={location}
-                  onChangeText={setLocation}
-                  selectionColor={Colors.primary}
-                />
-              </View>
-
-              {/* Brand */}
-              <Text style={styles.label}>Brand</Text>
-              <View style={styles.brandGrid}>
-                {BRANDS.map((brand) => (
-                  <TouchableOpacity
-                    key={brand}
-                    style={[
-                      styles.brandChip,
-                      selectedBrand === brand && styles.brandChipActive,
-                    ]}
-                    onPress={() => setSelectedBrand(brand)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      style={[
-                        styles.brandChipText,
-                        selectedBrand === brand && styles.brandChipTextActive,
-                      ]}
-                    >
-                      {brand}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              {/* Submit */}
-              <TouchableOpacity
-                style={styles.submitBtn}
-                activeOpacity={0.85}
-                onPress={onClose}
+              <ScrollView
+                style={styles.form}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
               >
-                <Ionicons
-                  name="add-circle"
-                  size={20}
-                  color="#fff"
-                  style={{ marginRight: 8 }}
-                />
-                <Text style={styles.submitText}>Add Camera</Text>
-              </TouchableOpacity>
+                {/* Camera Name */}
+                <Text style={styles.label}>Camera Name</Text>
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="camera-outline"
+                    size={18}
+                    color={Colors.textMuted}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="e.g. Pool South-West"
+                    placeholderTextColor={Colors.textMuted}
+                    value={name}
+                    onChangeText={setName}
+                    selectionColor={Colors.primary}
+                  />
+                </View>
 
-              <View style={{ height: 24 }} />
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
+                {/* IP Address */}
+                <Text style={styles.label}>IP Address</Text>
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="globe-outline"
+                    size={18}
+                    color={Colors.textMuted}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="e.g. 192.168.1.42"
+                    placeholderTextColor={Colors.textMuted}
+                    value={ip}
+                    onChangeText={setIp}
+                    keyboardType="decimal-pad"
+                    selectionColor={Colors.primary}
+                  />
+                </View>
+
+                {/* Location */}
+                <Text style={styles.label}>Location</Text>
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="location-outline"
+                    size={18}
+                    color={Colors.textMuted}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="e.g. Backyard, Deep End"
+                    placeholderTextColor={Colors.textMuted}
+                    value={location}
+                    onChangeText={setLocation}
+                    selectionColor={Colors.primary}
+                  />
+                </View>
+
+                {/* Brand */}
+                <Text style={styles.label}>Brand</Text>
+                <View style={styles.brandGrid}>
+                  {BRANDS.map((brand) => (
+                    <TouchableOpacity
+                      key={brand}
+                      style={[
+                        styles.brandChip,
+                        selectedBrand === brand && styles.brandChipActive,
+                      ]}
+                      onPress={() => setSelectedBrand(brand)}
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={[
+                          styles.brandChipText,
+                          selectedBrand === brand && styles.brandChipTextActive,
+                        ]}
+                      >
+                        {brand}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Submit */}
+                <TouchableOpacity
+                  style={styles.submitBtn}
+                  activeOpacity={0.85}
+                  onPress={onClose}
+                >
+                  <Ionicons
+                    name="add-circle"
+                    size={20}
+                    color="#fff"
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={styles.submitText}>Add Camera</Text>
+                </TouchableOpacity>
+
+                <View style={{ height: 24 }} />
+              </ScrollView>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
       </Modal>
     </>
   );
@@ -223,10 +226,10 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  sheetWrapper: {
+    width: "100%",
   },
   sheet: {
     backgroundColor: Colors.tipBackground,
