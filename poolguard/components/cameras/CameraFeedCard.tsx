@@ -18,7 +18,7 @@ interface CameraFeedCardProps {
   streamUrl?: string;
 }
 
-const FRAME_DELAY_MS = 150; // ~6 fps — smooth without tearing
+const FRAME_DELAY_MS = 100; // ~10 fps — 1.5× faster playback
 const STATUS_POLL_MS = 1000;
 type RiskStatus = "low" | "medium" | "danger" | "unknown";
 
