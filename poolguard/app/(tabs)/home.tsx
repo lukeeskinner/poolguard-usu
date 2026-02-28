@@ -56,7 +56,6 @@ export default function CamerasScreen() {
             />
           ))}
           <AddCameraButton />
-          <AICoverageTip tip="Add a third camera facing the patio entrance for 100% safety perimeter detection." />
         </ScrollView>
       </View>
     </SafeAreaView>
