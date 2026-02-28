@@ -36,6 +36,7 @@ def inference_loop():
             continue
 
         result = next_frame(frame)
+        print(result.image)
 
         img_bytes = base64.b64decode(result.image)
 
