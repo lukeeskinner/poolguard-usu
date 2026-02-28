@@ -100,14 +100,6 @@ export default function CameraFeedCard({
         else if (data.warningLevel === 1) setRiskStatus("medium");
         else if (data.warningLevel === 2) {
           setRiskStatus("danger");
-          setTimeout(() => {
-            addAlert({
-              severity: "emergency",
-              title: "🚨 Emergency: Possible Drowning Detected",
-              description:
-                "Emergency protocol initiated. Siren activated and emergency contacts notified.",
-            });
-          }, 2000);
         }
       } catch {
         // Keep last status if polling fails briefly.
@@ -248,20 +240,23 @@ export default function CameraFeedCard({
           </TouchableOpacity>
         </View>
       </View>
-      <Modal
-        visible={isFullscreen}
-        animationType="fade"
-        transparent
-        onRequestClose={() => {
-          if (!fsAlertVisible) setIsFullscreen(false);
-        }}
-      >
-        <View style={styles.fullscreenBackdrop}>{renderPreview(true)}</View>
-        <EmergencyAlertModal
-          visible={fsAlertVisible}
-          onDismiss={() => setFsAlertVisible(false)}
-        />
-      </Modal>
+
+      {isFullscreen && (
+        <Modal
+          visible={isFullscreen}
+          animationType="fade"
+          transparent
+          onRequestClose={() => {
+            if (!fsAlertVisible) setIsFullscreen(false);
+          }}
+        >
+          <View style={styles.fullscreenBackdrop}>{renderPreview(true)}</View>
+          <EmergencyAlertModal
+            visible={fsAlertVisible}
+            onDismiss={() => setFsAlertVisible(false)}
+          />
+        </Modal>
+      )}
     </>
   );
 }

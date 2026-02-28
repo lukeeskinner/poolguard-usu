@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import {
   getAlerts,
   subscribeAlerts,
+  subscribeEmergency,
   type AlertSeverity,
   type AppAlert,
 } from "@/utils/alertStore";
@@ -21,8 +22,10 @@ export default function AlertsScreen() {
 
   useEffect(() => {
     const unsubAlerts = subscribeAlerts(() => setAlerts([...getAlerts()]));
+    const unsubEmeAlerts = subscribeEmergency(() => setAlerts([...getAlerts()]));
     return () => {
       unsubAlerts();
+      unsubEmeAlerts();
     };
   }, []);
 

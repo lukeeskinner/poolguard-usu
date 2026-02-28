@@ -2,6 +2,8 @@ import { Tabs } from "expo-router";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import { useEffect, useState } from "react";
+import { subscribeAlerts, subscribeEmergency } from "@/utils/alertStore";
 
 interface TabIconProps {
   name: React.ComponentProps<typeof Ionicons>["name"];
@@ -29,6 +31,17 @@ function TabIcon({ name, color, label, badge }: TabIconProps) {
 }
 
 export default function TabLayout() {
+  const [alertCount, setAlertCount] = useState(0);
+
+  useEffect(() => {
+    const unsubAlerts = subscribeAlerts(() => setAlertCount(prev => prev+1));
+    const unsubEmeAlerts = subscribeEmergency(() => setAlertCount(prev => prev+1));
+    return () => {
+      unsubAlerts();
+      unsubEmeAlerts();
+    };
+  }, []);
+    
   return (
     <Tabs
       screenOptions={{
@@ -56,7 +69,7 @@ export default function TabLayout() {
               name="notifications-outline"
               color={color}
               label="ALERTS"
-              badge={1}
+              badge={alertCount}
             />
           ),
           tabBarActiveTintColor: Colors.activeTab,
