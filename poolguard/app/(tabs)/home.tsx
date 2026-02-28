@@ -14,8 +14,8 @@ const SERVER_URL = "http://144.39.217.106:5001";
 const CAMERAS = [
   {
     id: "1",
-    name: "Deep End",
-    signal: "Excellent" as const,
+    name: "Camera 1",
+    signal: "Excellent" as const, // THIS changes for the video
     resolution: "1080p",
     isLive: true,
     placeholderColor: "#4FA8C9",
@@ -23,8 +23,8 @@ const CAMERAS = [
   },
   {
     id: "2",
-    name: "Shallow End",
-    signal: "Good" as const,
+    name: "Camera 2",
+    signal: "Good" as const, // THIS changes for the video
     resolution: "1080p",
     isLive: true,
     placeholderColor: "#62C1D8",
@@ -56,7 +56,6 @@ export default function CamerasScreen() {
             />
           ))}
           <AddCameraButton />
-          <AICoverageTip tip="Add a third camera facing the patio entrance for 100% safety perimeter detection." />
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -66,7 +65,7 @@ export default function CamerasScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
   },
   container: {
     flex: 1,
