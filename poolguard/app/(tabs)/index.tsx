@@ -10,7 +10,7 @@ export default function DashboardScreen() {
     await sendLocalNotification(
       "⚠️ PoolGuard Alert",
       "Motion detected near the deep end. Tap to review the live feed.",
-      { screen: "home" }
+      { screen: "home" },
     );
   };
 
@@ -20,8 +20,16 @@ export default function DashboardScreen() {
         <Text style={styles.title}>Dashboard</Text>
         <Text style={styles.subtitle}>PoolGuard AI</Text>
 
-        <TouchableOpacity style={styles.button} onPress={handleTestNotification} activeOpacity={0.85}>
-          <Ionicons name="notifications-outline" size={20} color={Colors.white} />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleTestNotification}
+          activeOpacity={0.85}
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={20}
+            color={Colors.white}
+          />
           <Text style={styles.buttonText}>Send Test Notification</Text>
         </TouchableOpacity>
       </View>
@@ -69,4 +77,3 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
-

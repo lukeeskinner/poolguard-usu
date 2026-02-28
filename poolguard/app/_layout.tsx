@@ -4,7 +4,9 @@ import * as Notifications from "expo-notifications";
 import { registerForPushNotifications } from "@/utils/notifications";
 
 export default function RootLayout() {
-  const notificationListener = useRef<Notifications.EventSubscription | null>(null);
+  const notificationListener = useRef<Notifications.EventSubscription | null>(
+    null,
+  );
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
 
   useEffect(() => {

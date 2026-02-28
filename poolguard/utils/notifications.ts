@@ -13,7 +13,9 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export async function registerForPushNotifications(): Promise<string | undefined> {
+export async function registerForPushNotifications(): Promise<
+  string | undefined
+> {
   if (!Device.isDevice) {
     console.log("Push notifications require a physical device.");
     return;
@@ -49,7 +51,7 @@ export async function registerForPushNotifications(): Promise<string | undefined
 export async function sendLocalNotification(
   title: string,
   body: string,
-  data?: Record<string, unknown>
+  data?: Record<string, unknown>,
 ) {
   await Notifications.scheduleNotificationAsync({
     content: {
