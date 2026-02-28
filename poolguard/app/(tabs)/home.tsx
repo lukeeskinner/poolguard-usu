@@ -8,6 +8,9 @@ import CameraFeedCard from "@/components/cameras/CameraFeedCard";
 import AddCameraButton from "@/components/cameras/AddCameraButton";
 import AICoverageTip from "@/components/cameras/AICoverageTip";
 
+// Update this to your server's local IP address (e.g. "http://192.168.1.42:5001")
+const SERVER_URL = "http://144.39.217.106:5001";
+
 const CAMERAS = [
   {
     id: "1",
@@ -16,6 +19,7 @@ const CAMERAS = [
     resolution: "1080p",
     isLive: true,
     placeholderColor: "#4FA8C9",
+    streamUrl: `${SERVER_URL}/snapshot`,
   },
   {
     id: "2",
@@ -48,6 +52,7 @@ export default function CamerasScreen() {
               resolution={camera.resolution}
               isLive={camera.isLive}
               placeholderColor={camera.placeholderColor}
+              streamUrl={camera.streamUrl}
             />
           ))}
           <AddCameraButton />

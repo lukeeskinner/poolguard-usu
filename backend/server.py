@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
+from flask_socketio import SocketIO
 import base64
 import time
 import threading
@@ -8,6 +9,7 @@ from model import next_frame
 
 app = Flask(__name__)
 CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Start the fake camera background thread
 camera.start()
@@ -16,6 +18,9 @@ _latest_result = None
 _latest_frame_bytes = None
 _lock = threading.Lock()
 
+_LEVEL_NAMES = {0: 'low', 1: 'medium', 2: 'high'}
+_previous_warning_level = None
+
 
 def inference_loop():
     """
@@ -23,7 +28,7 @@ def inference_loop():
     Always processes the latest frame; intermediate frames are dropped if inference
     is slower than the camera capture rate.
     """
-    global _latest_result, _latest_frame_bytes
+    global _latest_result, _latest_frame_bytes, _previous_warning_level
     while True:
         frame = camera.get_latest_frame()
         if frame is None:
@@ -37,6 +42,15 @@ def inference_loop():
         with _lock:
             _latest_result = result
             _latest_frame_bytes = img_bytes
+
+        current_level = result.warningLevel
+        if _previous_warning_level is not None and current_level != _previous_warning_level:
+            socketio.emit('risk_change', {
+                'previous': _LEVEL_NAMES.get(_previous_warning_level),
+                'current': _LEVEL_NAMES.get(current_level),
+                'timestamp': time.time(),
+            })
+        _previous_warning_level = current_level
 
 
 _inference_thread = threading.Thread(target=inference_loop, daemon=True)
@@ -77,6 +91,19 @@ def video_feed():
     )
 
 
+@app.route('/snapshot')
+def snapshot():
+    with _lock:
+        frame_bytes = _latest_frame_bytes
+    if frame_bytes is None:
+        return Response(status=503)
+    return Response(
+        frame_bytes,
+        mimetype='image/jpeg',
+        headers={'Cache-Control': 'no-store'},
+    )
+
+
 @app.route('/analysis')
 def analysis():
     with _lock:
@@ -94,4 +121,4 @@ def test():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
