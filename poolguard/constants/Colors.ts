@@ -1,0 +1,18 @@
+export const Colors = {
+  primary: "#2563EB",
+  primaryLight: "#EFF4FF",
+  background: "#F5F6FA",
+  white: "#FFFFFF",
+  textPrimary: "#0F172A",
+  textSecondary: "#64748B",
+  textMuted: "#94A3B8",
+  border: "#E2E8F0",
+  live: "#22C55E",
+  activeTab: "#2563EB",
+  inactiveTab: "#94A3B8",
+  alertBadge: "#EF4444",
+  tipBackground: "#EFF4FF",
+  tipIcon: "#2563EB",
+  signalExcellent: "#22C55E",
+  signalGood: "#F59E0B",
+};

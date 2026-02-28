@@ -1,0 +1,76 @@
+import React from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Colors } from "@/constants/Colors";
+import ScreenHeader from "@/components/cameras/ScreenHeader";
+import LiveFeedHeader from "@/components/cameras/LiveFeedHeader";
+import CameraFeedCard from "@/components/cameras/CameraFeedCard";
+import AddCameraButton from "@/components/cameras/AddCameraButton";
+import AICoverageTip from "@/components/cameras/AICoverageTip";
+
+const CAMERAS = [
+  {
+    id: "1",
+    name: "Deep End",
+    signal: "Excellent" as const,
+    resolution: "1080p",
+    isLive: true,
+    placeholderColor: "#4FA8C9",
+  },
+  {
+    id: "2",
+    name: "Shallow End",
+    signal: "Good" as const,
+    resolution: "1080p",
+    isLive: true,
+    placeholderColor: "#62C1D8",
+  },
+];
+
+export default function CamerasScreen() {
+  return (
+    <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+      <View style={styles.container}>
+        <ScreenHeader title="PoolGuard AI" subtitle="Camera Management" />
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <LiveFeedHeader
+            activeCount={CAMERAS.filter((c) => c.isLive).length}
+          />
+          {CAMERAS.map((camera) => (
+            <CameraFeedCard
+              key={camera.id}
+              name={camera.name}
+              signal={camera.signal}
+              resolution={camera.resolution}
+              isLive={camera.isLive}
+              placeholderColor={camera.placeholderColor}
+            />
+          ))}
+          <AddCameraButton />
+          <AICoverageTip tip="Add a third camera facing the patio entrance for 100% safety perimeter detection." />
+        </ScrollView>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: Colors.white,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 10,
+  },
+});
