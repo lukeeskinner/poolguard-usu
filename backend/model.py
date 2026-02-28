@@ -124,14 +124,14 @@ def next_frame(image_input) -> FrameResult:
         response = _session.post(
             MODAL_API_URL,
             json={"image": b64_string},
-            timeout=30
+            timeout=40
         )
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"API Request failed: {e}")
-        with _cache_lock:
-            _inflight.pop(frame_hash, None)
-        our_event.set()
+        # with _cache_lock:
+        #     _inflight.pop(frame_hash, None)
+        # our_event.set()
         return None
 
     # 9. Parse the JSON response

@@ -31,7 +31,7 @@ def inference_loop():
     while camera.get_frame_count() == 0:
         time.sleep(0.01)
 
-    frame_interval = 1.0 / 10.0
+    frame_interval = 1.0 / 30.0
     total_frames = camera.get_frame_count()
     idx = 0
     
