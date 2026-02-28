@@ -39,16 +39,6 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
-        options={{
-          tabBarIcon: ({ color }) => (
-            <TabIcon name="grid-outline" color={color} label="DASHBOARD" />
-          ),
-          tabBarActiveTintColor: Colors.activeTab,
-          tabBarInactiveTintColor: Colors.inactiveTab,
-        }}
-      />
-      <Tabs.Screen
         name="home"
         options={{
           tabBarIcon: ({ color }) => (
@@ -71,6 +61,28 @@ export default function TabLayout() {
           ),
           tabBarActiveTintColor: Colors.activeTab,
           tabBarInactiveTintColor: Colors.inactiveTab,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          tabBarIcon: ({ color }) => (
+            <TabIcon name="settings-outline" color={color} label="SETTINGS" />
+          ),
+          tabBarActiveTintColor: Colors.activeTab,
+          tabBarInactiveTintColor: Colors.inactiveTab,
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="cameras"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

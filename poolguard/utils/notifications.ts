@@ -6,11 +6,10 @@ import { Platform } from "react-native";
 // Controls how notifications are shown when app is in foreground
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
     shouldShowBanner: true,
     shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
   }),
 });
 
@@ -18,14 +17,19 @@ export async function registerNotificationCategories() {
   try {
     await Notifications.setNotificationCategoryAsync("pool_alert", [
       {
-        identifier: "VIEW_FEED",
-        buttonTitle: "View Feed",
+        identifier: "CALL_911",
+        buttonTitle: "Call 911",
+        options: { isDestructive: true, opensAppToForeground: false },
+      },
+      {
+        identifier: "VIEW_LIVE",
+        buttonTitle: "View Live",
         options: { opensAppToForeground: true },
       },
       {
-        identifier: "DISMISS",
-        buttonTitle: "Dismiss",
-        options: { isDestructive: true, opensAppToForeground: false },
+        identifier: "OK",
+        buttonTitle: "OK",
+        options: { isDestructive: false, opensAppToForeground: false },
       },
     ]);
   } catch (e) {
@@ -93,6 +97,19 @@ export async function sendLocalNotification(
       data: data ?? {},
       sound: true,
       categoryIdentifier: "pool_alert",
+    },
+    trigger: null,
+  });
+}
+
+export async function sendEmergencyNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "🚨 Emergency: Possible Drowning Detected",
+      body: "Emergency protocol initiated. Siren activated and emergency contacts notified.",
+      sound: true,
+      categoryIdentifier: "pool_alert",
+      data: { type: "emergency" },
     },
     trigger: null,
   });

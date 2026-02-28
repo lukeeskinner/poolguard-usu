@@ -3,15 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import { sendLocalNotification } from "@/utils/notifications";
+import { sendEmergencyNotification } from "@/utils/notifications";
 
 export default function DashboardScreen() {
   const handleTestNotification = async () => {
-    await sendLocalNotification(
-      "⚠️ PoolGuard Alert",
-      "Motion detected near the deep end. Tap to review the live feed.",
-      { screen: "home" },
-    );
+    await sendEmergencyNotification();
   };
 
   return (
