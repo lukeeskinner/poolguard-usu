@@ -6,6 +6,9 @@ import {
   registerNotificationCategories,
 } from "@/utils/notifications";
 import EmergencyAlertModal from "@/components/EmergencyAlertModal";
+import { io, Socket } from "socket.io-client";
+
+const SERVER_URL = "http://144.39.217.106:5001";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -14,6 +17,7 @@ export default function RootLayout() {
     null,
   );
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     registerForPushNotifications();
@@ -33,9 +37,20 @@ export default function RootLayout() {
         }
       });
 
+    // Connect to the backend socket and listen for risk level changes
+    const socket = io(SERVER_URL, { transports: ["websocket"] });
+    socketRef.current = socket;
+
+    socket.on("risk_change", (data: { previous: string; current: string }) => {
+      if (data.current === "high") {
+        setAlertVisible(true);
+      }
+    });
+
     return () => {
       notificationListener.current?.remove();
       responseListener.current?.remove();
+      socket.disconnect();
     };
   }, []);
 
