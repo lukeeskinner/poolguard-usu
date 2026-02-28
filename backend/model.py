@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import hashlib
+import threading
 
 import requests
 import base64
@@ -37,6 +38,8 @@ MODAL_API_URL = "https://u1446904--pool-safety-a100-safetycalculator-next-frame.
 
 CACHE_MAX_SIZE = 500
 _frame_cache = OrderedDict()
+_cache_lock = threading.Lock()
+_inflight: dict = {}  # frame_hash -> threading.Event; prevents duplicate API calls
 
 # Reuse TCP connection across calls — cuts 30–50ms per frame
 _session = requests.Session()
@@ -91,15 +94,32 @@ def next_frame(image_input) -> FrameResult:
     # 5. Hash raw bytes (faster than hashing a huge UTF-8 base64 string)
     frame_hash = hashlib.sha256(raw_bytes).hexdigest()
 
-    if frame_hash in _frame_cache:
-        print("⚡ Cache hit! Skipping cloud API request.")
-        _frame_cache.move_to_end(frame_hash)
-        return _frame_cache[frame_hash]
+    # 6. Check cache / deduplicate in-flight requests
+    while True:
+        with _cache_lock:
+            if frame_hash in _frame_cache:
+                print("⚡ Cache hit! Skipping cloud API request.")
+                _frame_cache.move_to_end(frame_hash)
+                return _frame_cache[frame_hash]
 
-    # 6. Base64-encode for the JSON payload (server expects this format)
+            if frame_hash in _inflight:
+                # Another thread is already fetching this frame — wait for it
+                event = _inflight[frame_hash]
+            else:
+                # We're first — claim this request
+                event = threading.Event()
+                _inflight[frame_hash] = event
+                event = None
+                break
+
+        # Wait outside the lock, then loop back to check the cache
+        event.wait()
+
+    # 7. Base64-encode for the JSON payload (server expects this format)
     b64_string = base64.b64encode(raw_bytes).decode("utf-8")
 
-    # 7. Make the API request using the persistent session
+    # 8. Make the API request using the persistent session
+    our_event = _inflight[frame_hash]
     try:
         response = _session.post(
             MODAL_API_URL,
@@ -109,12 +129,15 @@ def next_frame(image_input) -> FrameResult:
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"API Request failed: {e}")
+        with _cache_lock:
+            _inflight.pop(frame_hash, None)
+        our_event.set()
         return None
 
-    # 8. Parse the JSON response
+    # 9. Parse the JSON response
     data = response.json()
 
-    # 9. Reconstruct your dataclasses
+    # 10. Reconstruct your dataclasses
     children_list = [
         Child(isInPool=c["isInPool"], distance=c["distance"])
         for c in data["children"]
@@ -130,9 +153,12 @@ def next_frame(image_input) -> FrameResult:
         warningLevel=data["warningLevel"]
     )
 
-    # 10. Save to cache with LRU eviction
-    _frame_cache[frame_hash] = result
-    if len(_frame_cache) > CACHE_MAX_SIZE:
-        _frame_cache.popitem(last=False)
+    # 11. Save to cache with LRU eviction, then wake waiting threads
+    with _cache_lock:
+        _frame_cache[frame_hash] = result
+        if len(_frame_cache) > CACHE_MAX_SIZE:
+            _frame_cache.popitem(last=False)
+        _inflight.pop(frame_hash, None)
 
+    our_event.set()
     return result
