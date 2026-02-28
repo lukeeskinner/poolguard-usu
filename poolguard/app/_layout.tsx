@@ -1,9 +1,15 @@
-import { Stack } from "expo-router";
-import { useEffect, useRef } from "react";
+import { Stack, useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
-import { registerForPushNotifications } from "@/utils/notifications";
+import {
+  registerForPushNotifications,
+  registerNotificationCategories,
+} from "@/utils/notifications";
+import EmergencyAlertModal from "@/components/EmergencyAlertModal";
 
 export default function RootLayout() {
+  const router = useRouter();
+  const [alertVisible, setAlertVisible] = useState(false);
   const notificationListener = useRef<Notifications.EventSubscription | null>(
     null,
   );
@@ -11,17 +17,20 @@ export default function RootLayout() {
 
   useEffect(() => {
     registerForPushNotifications();
+    registerNotificationCategories();
 
-    // Fires when a notification is received while app is open
+    // Show in-app modal when notification is received while app is open
     notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        console.log("Notification received:", notification);
+      Notifications.addNotificationReceivedListener(() => {
+        setAlertVisible(true);
       });
 
-    // Fires when user taps a notification
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log("Notification tapped:", response);
+        const actionId = response.actionIdentifier;
+        if (actionId === "VIEW_LIVE") {
+          router.push("/(tabs)/home");
+        }
       });
 
     return () => {
@@ -31,8 +40,18 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+      <EmergencyAlertModal
+        visible={alertVisible}
+        onViewLive={() => {
+          setAlertVisible(false);
+          router.push("/(tabs)/home");
+        }}
+        onDismiss={() => setAlertVisible(false)}
+      />
+    </>
   );
 }
