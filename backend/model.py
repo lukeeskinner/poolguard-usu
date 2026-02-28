@@ -77,8 +77,12 @@ def next_frame(image_input) -> FrameResult:
         for c in data["children"]
     ]
     
+    image_str = data["image"]
+    if "," in image_str:
+        image_str = image_str.split(",")[1]
+
     result = FrameResult(
-        image=data["image"],
+        image=image_str,
         children=children_list,
         warningLevel=data["warningLevel"]
     )
