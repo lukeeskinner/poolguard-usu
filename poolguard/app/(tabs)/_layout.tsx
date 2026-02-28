@@ -49,10 +49,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="cameras"
+        name="home"
         options={{
           tabBarIcon: ({ color }) => (
-            <TabIcon name="videocam-outline" color={color} label="CAMERAS" />
+            <TabIcon name="videocam-outline" color={color} label="HOME" />
           ),
           tabBarActiveTintColor: Colors.activeTab,
           tabBarInactiveTintColor: Colors.inactiveTab,
@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
+    minWidth: 80,
   },
   tabLabel: {
     fontSize: 10,
