@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "poolguard",
+    "name": "",
     "slug": "poolguard",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSContactsUsageDescription": "PoolGuard AI needs access to your contacts to add emergency contacts for pool safety alerts."
+        "NSContactsUsageDescription": "Mira needs access to your contacts to add emergency contacts for pool safety alerts."
       },
       "bundleIdentifier": "com.anonymous.poolguard"
     },
@@ -20,10 +20,7 @@
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/images/icon.png"
       },
-      "permissions": [
-        "READ_CONTACTS",
-        "READ_CONTACTS"
-      ],
+      "permissions": ["READ_CONTACTS", "READ_CONTACTS"],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "usesCleartextTraffic": true,

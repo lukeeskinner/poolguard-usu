@@ -284,7 +284,7 @@ export default function SettingsScreen() {
         </SettingSection>
 
         <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>PoolGuard AI</Text>
+          <Text style={styles.versionText}>Mira</Text>
           <Text style={styles.versionText}>Version 1.0.0 (Build 100)</Text>
         </View>
       </ScrollView>

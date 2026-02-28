@@ -82,7 +82,7 @@ export default function EmergencyAlertModal({
                 <Text style={styles.appIconText}>✱</Text>
               </View>
               <View style={styles.headerText}>
-                <Text style={styles.appName}>POOLGUARD AI</Text>
+                <Text style={styles.appName}>Mira</Text>
               </View>
               <Text style={styles.timestamp}>now</Text>
             </View>

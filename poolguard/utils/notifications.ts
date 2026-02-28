@@ -113,7 +113,7 @@ export function sendEmergencyNotification() {
   // No system notification scheduled — the modal IS the alert when the app is open.
   addAlert({
     severity: "emergency",
-    title: "🚨 Emergency: Possible Drowning Detected",
+    title: "Emergency: Possible Drowning Detected",
     description:
       "Emergency protocol initiated. Siren activated and emergency contacts notified.",
   });
