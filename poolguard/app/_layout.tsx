@@ -20,7 +20,7 @@ export default function RootLayout() {
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const lastAlertTimeRef = useRef<number>(0);
-  const ALERT_COOLDOWN_MS = 60_000; // 1 minute between drowning alerts
+  const ALERT_COOLDOWN_MS = 1_000; // 1 second between drowning alerts
 
   useEffect(() => {
     registerForPushNotifications();
@@ -49,16 +49,19 @@ export default function RootLayout() {
     socketRef.current = socket;
 
     socket.on("risk_change", (data: { previous: string; current: string }) => {
-      if (data.current === "high") {
-        // addAlert fires subscribeEmergency → modal, and adds entry to alert history
-        setTimeout(() => {
-          addAlert({
-            severity: "emergency",
-            title: "Emergency: Possible Drowning Detected",
-            description:
-              "Emergency protocol initiated. Siren activated and emergency contacts notified.",
-          });
-        }, 1000);
+      if (data.current === "high" && data.previous !== "high") {
+        const now = Date.now();
+        if (now - lastAlertTimeRef.current >= ALERT_COOLDOWN_MS) {
+          lastAlertTimeRef.current = now;
+          setTimeout(() => {
+            addAlert({
+              severity: "emergency",
+              title: "Emergency: Possible Drowning Detected",
+              description:
+                "Emergency protocol initiated. Siren activated and emergency contacts notified.",
+            });
+          }, 1000);
+        }
       }
     });
 

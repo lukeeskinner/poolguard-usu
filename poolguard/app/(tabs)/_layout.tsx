@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { useEffect, useState } from "react";
-import { subscribeAlerts, subscribeEmergency } from "@/utils/alertStore";
+import { AppAlert, getAlerts, subscribeAlerts, subscribeEmergency } from "@/utils/alertStore";
 
 interface TabIconProps {
   name: React.ComponentProps<typeof Ionicons>["name"];
@@ -31,11 +31,11 @@ function TabIcon({ name, color, label, badge }: TabIconProps) {
 }
 
 export default function TabLayout() {
-  const [alertCount, setAlertCount] = useState(0);
+  const [alerts, setAlerts] = useState<AppAlert[]>(getAlerts());
 
   useEffect(() => {
-    const unsubAlerts = subscribeAlerts(() => setAlertCount(prev => prev+1));
-    const unsubEmeAlerts = subscribeEmergency(() => setAlertCount(prev => prev+1));
+    const unsubAlerts = subscribeAlerts(() => setAlerts([...getAlerts()]));
+    const unsubEmeAlerts = subscribeEmergency(() => setAlerts([...getAlerts()]));
     return () => {
       unsubAlerts();
       unsubEmeAlerts();
@@ -69,7 +69,7 @@ export default function TabLayout() {
               name="notifications-outline"
               color={color}
               label="ALERTS"
-              badge={alertCount}
+              badge={alerts.length}
             />
           ),
           tabBarActiveTintColor: Colors.activeTab,
