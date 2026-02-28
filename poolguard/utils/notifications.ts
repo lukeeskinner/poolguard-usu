@@ -1,0 +1,99 @@
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import Constants from "expo-constants";
+import { Platform } from "react-native";
+
+// Controls how notifications are shown when app is in foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
+export async function registerNotificationCategories() {
+  try {
+    await Notifications.setNotificationCategoryAsync("pool_alert", [
+      {
+        identifier: "VIEW_FEED",
+        buttonTitle: "View Feed",
+        options: { opensAppToForeground: true },
+      },
+      {
+        identifier: "DISMISS",
+        buttonTitle: "Dismiss",
+        options: { isDestructive: true, opensAppToForeground: false },
+      },
+    ]);
+  } catch (e) {
+    console.log("Could not register notification categories:", e);
+  }
+}
+
+export async function registerForPushNotifications(): Promise<
+  string | undefined
+> {
+  if (!Device.isDevice) {
+    console.log("Push notifications require a physical device.");
+    return;
+  }
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#2563EB",
+    });
+  }
+
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== "granted") {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== "granted") {
+    console.log("Permission not granted for push notifications.");
+    return;
+  }
+
+  try {
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId ??
+      Constants?.easConfig?.projectId;
+
+    const token = (
+      await Notifications.getExpoPushTokenAsync(
+        projectId ? { projectId } : undefined,
+      )
+    ).data;
+    console.log("Expo Push Token:", token);
+    return token;
+  } catch (e) {
+    console.log("Push token unavailable (run `npx eas init` to fix):", e);
+    return;
+  }
+}
+
+export async function sendLocalNotification(
+  title: string,
+  body: string,
+  data?: Record<string, unknown>,
+) {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title,
+      body,
+      data: data ?? {},
+      sound: true,
+      categoryIdentifier: "pool_alert",
+    },
+    trigger: null,
+  });
+}
