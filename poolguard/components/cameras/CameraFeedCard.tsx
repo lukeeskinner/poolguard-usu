@@ -19,6 +19,8 @@ interface CameraFeedCardProps {
 }
 
 const FRAME_DELAY_MS = 150; // ~6 fps — smooth without tearing
+const STATUS_POLL_MS = 1000;
+type RiskStatus = "low" | "medium" | "danger" | "unknown";
 
 export default function CameraFeedCard({
   name,
@@ -32,9 +34,11 @@ export default function CameraFeedCard({
   const [shownUri, setShownUri] = useState<string | null>(null);
   // loadingUri: the next frame loading silently in the background
   const [loadingUri, setLoadingUri] = useState<string | null>(null);
+  const [riskStatus, setRiskStatus] = useState<RiskStatus>("unknown");
 
   const activeRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const statusTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const queueNext = useCallback(() => {
     if (!activeRef.current || !streamUrl) return;
@@ -53,6 +57,39 @@ export default function CameraFeedCard({
     return () => {
       activeRef.current = false;
       if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [streamUrl]);
+
+  useEffect(() => {
+    if (!streamUrl) {
+      setRiskStatus("unknown");
+      return;
+    }
+
+    const analysisUrl = streamUrl.replace("/snapshot", "/analysis");
+    let cancelled = false;
+
+    const pullStatus = async () => {
+      try {
+        const response = await fetch(`${analysisUrl}?t=${Date.now()}`);
+        if (!response.ok) return;
+        const data = (await response.json()) as { warningLevel?: number };
+        if (cancelled || typeof data.warningLevel !== "number") return;
+
+        if (data.warningLevel === 0) setRiskStatus("low");
+        else if (data.warningLevel === 1) setRiskStatus("medium");
+        else if (data.warningLevel === 2) setRiskStatus("danger");
+      } catch {
+        // Keep last status if polling fails briefly.
+      }
+    };
+
+    pullStatus();
+    statusTimerRef.current = setInterval(pullStatus, STATUS_POLL_MS);
+
+    return () => {
+      cancelled = true;
+      if (statusTimerRef.current) clearInterval(statusTimerRef.current);
     };
   }, [streamUrl]);
 
@@ -101,12 +138,31 @@ export default function CameraFeedCard({
           />
         )}
 
-        {isLive && (
-          <View style={styles.liveBadge}>
-            <View style={styles.liveDot} />
-            <Text style={styles.liveText}>LIVE</Text>
-          </View>
-        )}
+        <View style={styles.leftOverlay}>
+          {isLive && (
+            <View style={styles.liveBadge}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>LIVE</Text>
+            </View>
+          )}
+          {riskStatus !== "unknown" && (
+            <View
+              style={[
+                styles.statusBadge,
+                riskStatus === "low" && styles.statusBadgeLow,
+                riskStatus === "medium" && styles.statusBadgeMedium,
+                riskStatus === "danger" && styles.statusBadgeDanger,
+              ]}
+            >
+              <View style={styles.statusDot} />
+              <Text style={styles.statusText}>
+                {riskStatus === "low" && "LOW RISK"}
+                {riskStatus === "medium" && "MEDIUM RISK"}
+                {riskStatus === "danger" && "DANGER"}
+              </Text>
+            </View>
+          )}
+        </View>
         <View style={styles.signalIcon}>
           <Ionicons name="cellular" size={18} color="rgba(255,255,255,0.85)" />
         </View>
@@ -170,6 +226,39 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.live,
   },
   liveText: {
+    color: Colors.white,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.8,
+  },
+  leftOverlay: {
+    alignItems: "flex-start",
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    gap: 5,
+    marginTop: 8,
+  },
+  statusBadgeLow: {
+    backgroundColor: "rgba(22, 163, 74, 0.9)",
+  },
+  statusBadgeMedium: {
+    backgroundColor: "rgba(234, 179, 8, 0.9)",
+  },
+  statusBadgeDanger: {
+    backgroundColor: "rgba(220, 38, 38, 0.9)",
+  },
+  statusDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: Colors.white,
+  },
+  statusText: {
     color: Colors.white,
     fontSize: 11,
     fontWeight: "700",
