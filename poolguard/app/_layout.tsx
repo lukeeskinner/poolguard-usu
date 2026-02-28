@@ -7,7 +7,7 @@ import {
 } from "@/utils/notifications";
 import EmergencyAlertModal from "@/components/EmergencyAlertModal";
 import { io, Socket } from "socket.io-client";
-import { subscribeEmergency } from "@/utils/alertStore";
+import { subscribeEmergency, addAlert } from "@/utils/alertStore";
 
 const SERVER_URL = "https://vessel-foot-pot-sol.trycloudflare.com";
 
@@ -51,7 +51,13 @@ export default function RootLayout() {
         const now = Date.now();
         if (now - lastAlertTimeRef.current >= ALERT_COOLDOWN_MS) {
           lastAlertTimeRef.current = now;
-          setAlertVisible(true);
+          // addAlert fires subscribeEmergency → modal, and adds entry to alert history
+          addAlert({
+            severity: "emergency",
+            title: "🚨 Emergency: Possible Drowning Detected",
+            description:
+              "Emergency protocol initiated. Siren activated and emergency contacts notified.",
+          });
         }
       }
     });
