@@ -50,17 +50,15 @@ export default function RootLayout() {
 
     socket.on("risk_change", (data: { previous: string; current: string }) => {
       if (data.current === "high") {
-        const now = Date.now();
-        if (now - lastAlertTimeRef.current >= ALERT_COOLDOWN_MS) {
-          lastAlertTimeRef.current = now;
-          // addAlert fires subscribeEmergency → modal, and adds entry to alert history
+        // addAlert fires subscribeEmergency → modal, and adds entry to alert history
+        setTimeout(() => {
           addAlert({
             severity: "emergency",
             title: "Emergency: Possible Drowning Detected",
             description:
               "Emergency protocol initiated. Siren activated and emergency contacts notified.",
           });
-        }
+        }, 1000);
       }
     });
 
