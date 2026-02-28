@@ -9,7 +9,7 @@ import EmergencyAlertModal from "@/components/EmergencyAlertModal";
 import { io, Socket } from "socket.io-client";
 import { subscribeEmergency, addAlert } from "@/utils/alertStore";
 
-const SERVER_URL = "https://homepage-psi-cognitive-total.trycloudflare.com";
+const SERVER_URL = "https://promotions-slowly-julia-bio.trycloudflare.com";
 
 export default function RootLayout() {
   const router = useRouter();
