@@ -1,5 +1,6 @@
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
+import Constants from "expo-constants";
 import { Platform } from "react-native";
 
 // Controls how notifications are shown when app is in foreground
@@ -12,6 +13,25 @@ Notifications.setNotificationHandler({
     shouldShowList: true,
   }),
 });
+
+export async function registerNotificationCategories() {
+  try {
+    await Notifications.setNotificationCategoryAsync("pool_alert", [
+      {
+        identifier: "VIEW_FEED",
+        buttonTitle: "View Feed",
+        options: { opensAppToForeground: true },
+      },
+      {
+        identifier: "DISMISS",
+        buttonTitle: "Dismiss",
+        options: { isDestructive: true, opensAppToForeground: false },
+      },
+    ]);
+  } catch (e) {
+    console.log("Could not register notification categories:", e);
+  }
+}
 
 export async function registerForPushNotifications(): Promise<
   string | undefined
@@ -43,9 +63,22 @@ export async function registerForPushNotifications(): Promise<
     return;
   }
 
-  const token = (await Notifications.getExpoPushTokenAsync()).data;
-  console.log("Expo Push Token:", token);
-  return token;
+  try {
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId ??
+      Constants?.easConfig?.projectId;
+
+    const token = (
+      await Notifications.getExpoPushTokenAsync(
+        projectId ? { projectId } : undefined,
+      )
+    ).data;
+    console.log("Expo Push Token:", token);
+    return token;
+  } catch (e) {
+    console.log("Push token unavailable (run `npx eas init` to fix):", e);
+    return;
+  }
 }
 
 export async function sendLocalNotification(
@@ -59,7 +92,8 @@ export async function sendLocalNotification(
       body,
       data: data ?? {},
       sound: true,
+      categoryIdentifier: "pool_alert",
     },
-    trigger: null, // fires immediately
+    trigger: null,
   });
 }
