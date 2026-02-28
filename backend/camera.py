@@ -6,41 +6,72 @@ from collections import deque
 
 VIDEO_PATH = os.path.join(os.path.dirname(__file__), 'test.mp4')
 
-# Pre-loaded frames so every loop hits the exact same pixel data
 _frames = []
-_fps = 30.0
-
-# Shared buffer of the last 10 frames
+_fps = 30.0  # Your target emulated FPS
 frame_buffer = deque(maxlen=10)
 _lock = threading.Lock()
 _running = False
 
-
 def _preload():
-    """Load all video frames into memory once so loops are deterministic."""
-    global _fps
+    """Only load frames that match the target _fps into memory."""
+    global _frames
     cap = cv2.VideoCapture(VIDEO_PATH)
-    _fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    if not cap.isOpened():
+        print(f"[camera] Error: Could not open {VIDEO_PATH}")
+        return
+
+    native_fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    
+    # Calculate the step: if video is 30fps and target is 5fps, we take every 6th frame
+    frame_step = native_fps / _fps
+    
+    current_video_idx = 0
+    target_frame_count = 0
+    
     while True:
         success, frame = cap.read()
         if not success:
             break
-        _frames.append(frame)
+        
+        # Logic: Only keep the frame if it's the "closest" to our target timeline
+        if current_video_idx >= (target_frame_count * frame_step):
+            _frames.append(frame)
+            target_frame_count += 1
+            
+        current_video_idx += 1
+        
     cap.release()
-    print(f"[camera] Pre-loaded {len(_frames)} frames at {_fps:.1f} fps")
-
+    print(f"[camera] Resampled {current_video_idx} native frames into {len(_frames)} cached frames at {_fps} FPS")
 
 def _capture_loop():
     if not _frames:
         return
+        
     delay = 1.0 / _fps
     idx = 0
+    
+    # Use a fixed start point to maintain perfect cadence
+    start_time = time.monotonic()
+    
     while _running:
         with _lock:
             frame_buffer.append(_frames[idx])
+        
         idx = (idx + 1) % len(_frames)
-        time.sleep(delay)
-
+        
+        # Calculate next wake up time relative to start to prevent drift
+        # This ensures 5fps stays 5fps over long durations
+        next_wake = start_time + (idx * delay)
+        
+        # Reset timeline on loop
+        if idx == 0:
+            # Shift the absolute timeline forward by exactly one video duration
+            start_time += len(_frames) * delay
+            next_wake = start_time
+            
+        sleep_time = next_wake - time.monotonic()
+        if sleep_time > 0:
+            time.sleep(sleep_time)
 
 def start():
     global _running
@@ -48,7 +79,6 @@ def start():
     _running = True
     t = threading.Thread(target=_capture_loop, daemon=True)
     t.start()
-
 
 def stop():
     global _running

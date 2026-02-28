@@ -1,3 +1,6 @@
+from collections import deque
+from concurrent.futures import ThreadPoolExecutor
+
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from flask_socketio import SocketIO
@@ -23,50 +26,64 @@ _previous_warning_level = None
 
 
 def inference_loop():
-    """
-    Runs inference in a background thread, completely decoupled from streaming.
-    Iterates through pre-loaded frames sequentially by index so every loop hits
-    the same frames in the same order, keeping the model cache valid.
-    """
     global _latest_result, _latest_frame_bytes, _previous_warning_level
 
-    # Wait until frames are available
     while camera.get_frame_count() == 0:
         time.sleep(0.01)
 
-    frame_interval = 1 / 10
+    frame_interval = 1.0 / 10.0
+    total_frames = camera.get_frame_count()
     idx = 0
-    while True:
-        frame_start = time.monotonic()
+    
+    future_queue = deque()
+    
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        # Priming the pump
+        for _ in range(min(8, total_frames)):
+            frame = camera.get_frame(idx)
+            future_queue.append(executor.submit(next_frame, frame))
+            idx = (idx + 1) % total_frames
 
-        frame = camera.get_frame(idx)
-        idx = (idx + 1) % camera.get_frame_count()
+        # Setup absolute timeline anchor
+        next_wake_time = time.monotonic() + frame_interval
 
-        result = next_frame(frame)
-        if result is None:
-            continue
-        print(result.image)
+        while True:
+            # 1. Wait for the oldest frame in the pipe
+            try:
+                result = future_queue.popleft().result()
+                
+                # 3. UI/State Updates (Moved inside try block so errors skip updates)
+                img_bytes = base64.b64decode(result.image)
+                with _lock:
+                    _latest_result = result
+                    _latest_frame_bytes = img_bytes
 
-        img_bytes = base64.b64decode(result.image)
+                current_level = result.warningLevel
+                if _previous_warning_level is not None and current_level != _previous_warning_level:
+                    socketio.emit('risk_change', {
+                        'previous': _LEVEL_NAMES.get(_previous_warning_level),
+                        'current': _LEVEL_NAMES.get(current_level),
+                        'timestamp': time.time(),
+                    })
+                _previous_warning_level = current_level
 
-        with _lock:
-            _latest_result = result
-            _latest_frame_bytes = img_bytes
+            except Exception as e:
+                print(f"Inference error: {e}")
+                # Notice we removed 'continue'. 
+                # We MUST proceed to Step 2 to keep the pipeline alive.
 
-        current_level = result.warningLevel
-        if _previous_warning_level is not None and current_level != _previous_warning_level:
-            socketio.emit('risk_change', {
-                'previous': _LEVEL_NAMES.get(_previous_warning_level),
-                'current': _LEVEL_NAMES.get(current_level),
-                'timestamp': time.time(),
-            })
-        _previous_warning_level = current_level
+            # 2. Immediately submit the NEXT frame (Guaranteed to execute)
+            frame = camera.get_frame(idx)
+            future_queue.append(executor.submit(next_frame, frame))
+            idx = (idx + 1) % total_frames
 
-        elapsed = time.monotonic() - frame_start
-        sleep_time = frame_interval - elapsed
-        if sleep_time > 0:
-            time.sleep(sleep_time)
-
+            # 4. Absolute Timing control
+            sleep_time = next_wake_time - time.monotonic()
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+                
+            # Push the timeline forward exactly one interval, preventing drift
+            next_wake_time += frame_interval
 
 _inference_thread = threading.Thread(target=inference_loop, daemon=True)
 _inference_thread.start()

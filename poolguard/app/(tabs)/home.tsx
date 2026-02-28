@@ -1,5 +1,5 @@
-import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import ScreenHeader from "@/components/cameras/ScreenHeader";
@@ -9,7 +9,7 @@ import AddCameraButton from "@/components/cameras/AddCameraButton";
 import AICoverageTip from "@/components/cameras/AICoverageTip";
 
 // Update this to your server's local IP address (e.g. "http://192.168.1.42:5001")
-const SERVER_URL = "https://initial-warrant-jade-returns.trycloudflare.com ";
+const SERVER_URL = "https://navigate-funky-roads-salad.trycloudflare.com";
 
 const CAMERAS = [
   {
@@ -32,31 +32,56 @@ const CAMERAS = [
 ];
 
 export default function CamerasScreen() {
+  const [selectedCameraId, setSelectedCameraId] = useState(CAMERAS[0].id);
+  const selectedCamera =
+    CAMERAS.find((camera) => camera.id === selectedCameraId) ?? CAMERAS[0];
+
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <View style={styles.container}>
         <ScreenHeader title="PoolGuard AI" subtitle="Camera Management" />
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={styles.content}>
           <LiveFeedHeader
             activeCount={CAMERAS.filter((c) => c.isLive).length}
           />
-          {CAMERAS.map((camera) => (
+
+          <View style={styles.videoTabs}>
+            {CAMERAS.map((camera) => {
+              const isActive = camera.id === selectedCamera.id;
+              return (
+                <TouchableOpacity
+                  key={camera.id}
+                  style={[styles.videoTab, isActive && styles.videoTabActive]}
+                  onPress={() => setSelectedCameraId(camera.id)}
+                  activeOpacity={0.8}
+                >
+                  <Text
+                    style={[
+                      styles.videoTabText,
+                      isActive && styles.videoTabTextActive,
+                    ]}
+                  >
+                    {camera.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <View style={styles.centerCard}>
             <CameraFeedCard
-              key={camera.id}
-              name={camera.name}
-              signal={camera.signal}
-              resolution={camera.resolution}
-              isLive={camera.isLive}
-              placeholderColor={camera.placeholderColor}
-              streamUrl={camera.streamUrl}
+              key={selectedCamera.id}
+              name={selectedCamera.name}
+              signal={selectedCamera.signal}
+              resolution={selectedCamera.resolution}
+              isLive={selectedCamera.isLive}
+              placeholderColor={selectedCamera.placeholderColor}
+              streamUrl={selectedCamera.streamUrl}
             />
-          ))}
+          </View>
+
           <AddCameraButton />
-        </ScrollView>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -71,10 +96,40 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  scroll: {
+  content: {
     flex: 1,
   },
-  scrollContent: {
-    paddingBottom: 10,
+  videoTabs: {
+    flexDirection: "row",
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 10,
+    backgroundColor: Colors.tipBackground,
+    borderRadius: 12,
+    padding: 4,
+    gap: 6,
+  },
+  videoTab: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  videoTabActive: {
+    backgroundColor: Colors.primary,
+  },
+  videoTabText: {
+    color: Colors.textSecondary,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  videoTabTextActive: {
+    color: Colors.white,
+  },
+  centerCard: {
+    flex: 1,
+    justifyContent: "center",
+    paddingBottom: 12,
   },
 });

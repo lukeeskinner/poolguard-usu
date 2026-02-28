@@ -8,7 +8,7 @@ import {
 import EmergencyAlertModal from "@/components/EmergencyAlertModal";
 import { io, Socket } from "socket.io-client";
 
-const SERVER_URL = "https://initial-warrant-jade-returns.trycloudflare.com";
+const SERVER_URL = "https://navigate-funky-roads-salad.trycloudflare.com";
 
 export default function RootLayout() {
   const router = useRouter();
