@@ -9,7 +9,7 @@ import AddCameraButton from "@/components/cameras/AddCameraButton";
 import AICoverageTip from "@/components/cameras/AICoverageTip";
 
 // Update this to your server's local IP address (e.g. "http://192.168.1.42:5001")
-const SERVER_URL = "https://job-pal-approaches-compound.trycloudflare.com";
+const SERVER_URL = "https://respondent-dialogue-thee-motel.trycloudflare.com";
 
 const CAMERAS = [
   {
