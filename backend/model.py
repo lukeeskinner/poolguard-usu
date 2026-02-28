@@ -1,3 +1,6 @@
+from collections import OrderedDict
+import hashlib
+
 import requests
 import base64
 from io import BytesIO
@@ -22,13 +25,16 @@ class FrameResult:
 # Paste the URL Modal gave you when you ran `modal deploy deploy_a100.py`
 MODAL_API_URL = "https://u1446904--pool-safety-a100-safetycalculator-next-frame.modal.run"
 
+CACHE_MAX_SIZE = 50
+_frame_cache = OrderedDict()
+
 def next_frame(image_input) -> FrameResult:
     """
-    Takes an OpenCV frame or PIL Image, sends it to Modal, and returns a FrameResult.
+    Takes an OpenCV frame or PIL Image, checks the cache, 
+    sends it to Modal if new, and returns a FrameResult.
     """
     # 1. Convert OpenCV NumPy array to PIL Image
     if isinstance(image_input, np.ndarray):
-        # OpenCV uses BGR, PIL uses RGB. We must convert the color channels!
         image = Image.fromarray(cv2.cvtColor(image_input, cv2.COLOR_BGR2RGB))
     elif isinstance(image_input, Image.Image):
         image = image_input
@@ -40,7 +46,17 @@ def next_frame(image_input) -> FrameResult:
     image.convert("RGB").save(buffered, format="JPEG")
     b64_string = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-    # 3. Make the API request to your Modal A100 Server
+    # 3. HASH AND CACHE CHECK
+    # We create a unique digital fingerprint of the image
+    frame_hash = hashlib.sha256(b64_string.encode('utf-8')).hexdigest()
+    
+    if frame_hash in _frame_cache:
+        print("⚡ Cache hit! Skipping cloud API request.")
+        # Move this item to the end of the OrderedDict so it isn't deleted as "old"
+        _frame_cache.move_to_end(frame_hash)
+        return _frame_cache[frame_hash]
+
+    # 4. Make the API request to your Modal A100 Server
     try:
         response = requests.post(
             MODAL_API_URL, 
@@ -52,17 +68,27 @@ def next_frame(image_input) -> FrameResult:
         print(f"API Request failed: {e}")
         return None
 
-    # 4. Parse the JSON response
+    # 5. Parse the JSON response
     data = response.json()
 
-    # 5. Reconstruct your dataclasses
+    # 6. Reconstruct your dataclasses
     children_list = [
         Child(isInPool=c["isInPool"], distance=c["distance"]) 
         for c in data["children"]
     ]
     
-    return FrameResult(
+    result = FrameResult(
         image=data["image"],
         children=children_list,
         warningLevel=data["warningLevel"]
     )
+
+    # 7. SAVE TO CACHE
+    _frame_cache[frame_hash] = result
+    
+    # Enforce the maximum cache size to prevent memory leaks
+    if len(_frame_cache) > CACHE_MAX_SIZE:
+        # popitem(last=False) removes the oldest (First-In) item
+        _frame_cache.popitem(last=False)
+
+    return result
