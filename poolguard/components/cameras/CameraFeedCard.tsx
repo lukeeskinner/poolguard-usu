@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
@@ -15,6 +15,7 @@ interface CameraFeedCardProps {
   resolution: string;
   isLive: boolean;
   placeholderColor: string;
+  streamUrl?: string;
 }
 
 export default function CameraFeedCard({
@@ -23,7 +24,26 @@ export default function CameraFeedCard({
   resolution,
   isLive,
   placeholderColor,
+  streamUrl,
 }: CameraFeedCardProps) {
+  const [frameUri, setFrameUri] = useState<string | null>(null);
+  const activeRef = useRef(false);
+
+  useEffect(() => {
+    if (!streamUrl) return;
+    activeRef.current = true;
+    // Kick off the first frame immediately
+    setFrameUri(`${streamUrl}?t=${Date.now()}`);
+    return () => {
+      activeRef.current = false;
+    };
+  }, [streamUrl]);
+
+  const fetchNextFrame = () => {
+    if (!activeRef.current || !streamUrl) return;
+    setFrameUri(`${streamUrl}?t=${Date.now()}`);
+  };
+
   const signalColor =
     signal === "Excellent"
       ? Colors.signalExcellent
@@ -33,8 +53,17 @@ export default function CameraFeedCard({
 
   return (
     <View style={styles.card}>
-      {/* Feed Preview Placeholder */}
+      {/* Feed Preview */}
       <View style={[styles.feedPreview, { backgroundColor: placeholderColor }]}>
+        {frameUri && (
+          <Image
+            source={{ uri: frameUri }}
+            style={StyleSheet.absoluteFillObject}
+            resizeMode="cover"
+            onLoad={fetchNextFrame}
+            onError={fetchNextFrame}
+          />
+        )}
         {isLive && (
           <View style={styles.liveBadge}>
             <View style={styles.liveDot} />

@@ -23,7 +23,8 @@
       },
       "permissions": ["READ_CONTACTS"],
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "usesCleartextTraffic": true
     },
     "web": {
       "output": "static",

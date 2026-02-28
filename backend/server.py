@@ -91,6 +91,19 @@ def video_feed():
     )
 
 
+@app.route('/snapshot')
+def snapshot():
+    with _lock:
+        frame_bytes = _latest_frame_bytes
+    if frame_bytes is None:
+        return Response(status=503)
+    return Response(
+        frame_bytes,
+        mimetype='image/jpeg',
+        headers={'Cache-Control': 'no-store'},
+    )
+
+
 @app.route('/analysis')
 def analysis():
     with _lock:
@@ -108,4 +121,4 @@ def test():
 
 
 if __name__ == '__main__':
-    socketio.run(app, port=5001, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
