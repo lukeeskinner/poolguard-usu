@@ -66,7 +66,7 @@ export default function CamerasScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
   },
   container: {
     flex: 1,
