@@ -8,8 +8,7 @@ import {
 import EmergencyAlertModal from "@/components/EmergencyAlertModal";
 import { io, Socket } from "socket.io-client";
 
-const SERVER_URL =
-  "https://respondent-dialogue-thee-motel.trycloudflare.com:5001";
+const SERVER_URL = "https://initial-warrant-jade-returns.trycloudflare.com";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -19,6 +18,8 @@ export default function RootLayout() {
   );
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const lastAlertTimeRef = useRef<number>(0);
+  const ALERT_COOLDOWN_MS = 60_000; // 1 minute between drowning alerts
 
   useEffect(() => {
     registerForPushNotifications();
@@ -27,7 +28,11 @@ export default function RootLayout() {
     // Show in-app modal when notification is received while app is open
     notificationListener.current =
       Notifications.addNotificationReceivedListener(() => {
-        setAlertVisible(true);
+        const now = Date.now();
+        if (now - lastAlertTimeRef.current >= ALERT_COOLDOWN_MS) {
+          lastAlertTimeRef.current = now;
+          setAlertVisible(true);
+        }
       });
 
     responseListener.current =
@@ -44,7 +49,11 @@ export default function RootLayout() {
 
     socket.on("risk_change", (data: { previous: string; current: string }) => {
       if (data.current === "high") {
-        setAlertVisible(true);
+        const now = Date.now();
+        if (now - lastAlertTimeRef.current >= ALERT_COOLDOWN_MS) {
+          lastAlertTimeRef.current = now;
+          setAlertVisible(true);
+        }
       }
     });
 
