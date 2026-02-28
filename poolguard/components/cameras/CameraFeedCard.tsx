@@ -246,9 +246,7 @@ export default function CameraFeedCard({
           visible={isFullscreen}
           animationType="fade"
           transparent
-          onRequestClose={() => {
-            if (!fsAlertVisible) setIsFullscreen(false);
-          }}
+          onRequestClose={() => setIsFullscreen(false)}
         >
           <View style={styles.fullscreenBackdrop}>{renderPreview(true)}</View>
           <EmergencyAlertModal
