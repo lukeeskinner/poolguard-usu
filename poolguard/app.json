@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSContactsUsageDescription": "PoolGuard AI needs access to your contacts to add emergency contacts for pool safety alerts."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,6 +21,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "permissions": ["READ_CONTACTS"],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },

@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 interface SettingItemProps {
   icon: React.ComponentProps<typeof Ionicons>["name"];
@@ -98,6 +99,7 @@ function SettingSection({ title, children }: SettingSectionProps) {
 }
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const [pushNotifications, setPushNotifications] = useState(true);
   const [criticalAlerts, setCriticalAlerts] = useState(true);
   const [autoCall911, setAutoCall911] = useState(false);
@@ -154,7 +156,10 @@ export default function SettingsScreen() {
             toggleValue={notifyEmergencyContacts}
             onToggleChange={setNotifyEmergencyContacts}
           />
-          <TouchableOpacity style={styles.linkButton}>
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={() => router.push("/(tabs)/emergency")}
+          >
             <Text style={styles.linkButtonText}>Manage Emergency Contacts</Text>
             <Ionicons name="chevron-forward" size={18} color="#3B82F6" />
           </TouchableOpacity>
