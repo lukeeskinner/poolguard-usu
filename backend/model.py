@@ -22,6 +22,16 @@ class FrameResult:
     children: List[Child]
     warningLevel: int
 
+    def to_dict(self):
+        return {
+            "image": self.image,
+            "children": [
+                {"isInPool": c.isInPool, "distance": c.distance}
+                for c in self.children
+            ],
+            "warningLevel": self.warningLevel,
+        }
+
 # Paste the URL Modal gave you when you ran `modal deploy deploy_a100.py`
 MODAL_API_URL = "https://u1446904--pool-safety-a100-safetycalculator-next-frame.modal.run" 
 

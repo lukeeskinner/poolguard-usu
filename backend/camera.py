@@ -7,7 +7,7 @@ from collections import deque
 VIDEO_PATH = os.path.join(os.path.dirname(__file__), 'test.mp4')
 
 _frames = []
-_fps = 5.0  # Your target emulated FPS
+_fps = 30.0  # Your target emulated FPS
 frame_buffer = deque(maxlen=10)
 _lock = threading.Lock()
 _running = False
@@ -65,8 +65,9 @@ def _capture_loop():
         
         # Reset timeline on loop
         if idx == 0:
-            start_time = time.monotonic()
-            next_wake = start_time + delay
+            # Shift the absolute timeline forward by exactly one video duration
+            start_time += len(_frames) * delay
+            next_wake = start_time
             
         sleep_time = next_wake - time.monotonic()
         if sleep_time > 0:
