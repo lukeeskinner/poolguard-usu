@@ -4,10 +4,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Modal,
+  Pressable,
 } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface CameraFeedCardProps {
   name: string;
@@ -30,11 +33,13 @@ export default function CameraFeedCard({
   placeholderColor,
   streamUrl,
 }: CameraFeedCardProps) {
+  const insets = useSafeAreaInsets();
   // shownUri: the last fully-loaded frame — always visible, never flashes
   const [shownUri, setShownUri] = useState<string | null>(null);
   // loadingUri: the next frame loading silently in the background
   const [loadingUri, setLoadingUri] = useState<string | null>(null);
   const [riskStatus, setRiskStatus] = useState<RiskStatus>("unknown");
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const activeRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -111,81 +116,122 @@ export default function CameraFeedCard({
         ? Colors.signalGood
         : Colors.alertBadge;
 
-  return (
-    <View style={styles.card}>
-      {/* Feed Preview */}
-      <View style={[styles.feedPreview, { backgroundColor: placeholderColor }]}>
+  const renderPreview = (fullscreen: boolean) => {
+    const overlayTopInset = fullscreen ? insets.top + 8 : 0;
 
-        {/* Layer 1: last good frame — always visible, never re-fetches */}
-        {shownUri && (
-          <Image
-            source={{ uri: shownUri }}
-            style={StyleSheet.absoluteFillObject}
-            contentFit="contain"
-            cachePolicy="memory"
-          />
+    return (
+    <View
+      style={[
+        styles.feedPreview,
+        fullscreen && styles.feedPreviewFullscreen,
+        { backgroundColor: fullscreen ? "#000000" : placeholderColor },
+      ]}
+    >
+      {/* Layer 1: last good frame — always visible, never re-fetches */}
+      {shownUri && (
+        <Image
+          source={{ uri: shownUri }}
+          style={StyleSheet.absoluteFillObject}
+          contentFit="contain"
+          cachePolicy="memory"
+        />
+      )}
+
+      {/* Layer 2: next frame loading silently behind the scenes */}
+      {loadingUri && (
+        <Image
+          source={{ uri: loadingUri }}
+          style={[StyleSheet.absoluteFillObject, { opacity: 0 }]}
+          contentFit="contain"
+          cachePolicy="memory"
+          onLoad={onFrameReady}
+          onError={onFrameError}
+        />
+      )}
+
+      <View style={[styles.leftOverlay, { marginTop: overlayTopInset }]}>
+        {isLive && (
+          <View style={styles.liveBadge}>
+            <View style={styles.liveDot} />
+            <Text style={styles.liveText}>LIVE</Text>
+          </View>
         )}
-
-        {/* Layer 2: next frame loading silently behind the scenes */}
-        {loadingUri && (
-          <Image
-            source={{ uri: loadingUri }}
-            style={[StyleSheet.absoluteFillObject, { opacity: 0 }]}
-            contentFit="contain"
-            cachePolicy="memory"
-            onLoad={onFrameReady}
-            onError={onFrameError}
-          />
-        )}
-
-        <View style={styles.leftOverlay}>
-          {isLive && (
-            <View style={styles.liveBadge}>
-              <View style={styles.liveDot} />
-              <Text style={styles.liveText}>LIVE</Text>
-            </View>
-          )}
-          {riskStatus !== "unknown" && (
-            <View
-              style={[
-                styles.statusBadge,
-                riskStatus === "low" && styles.statusBadgeLow,
-                riskStatus === "medium" && styles.statusBadgeMedium,
-                riskStatus === "danger" && styles.statusBadgeDanger,
-              ]}
-            >
-              <View style={styles.statusDot} />
-              <Text style={styles.statusText}>
-                {riskStatus === "low" && "LOW RISK"}
-                {riskStatus === "medium" && "MEDIUM RISK"}
-                {riskStatus === "danger" && "DANGER"}
-              </Text>
-            </View>
-          )}
-        </View>
-        <View style={styles.signalIcon}>
-          <Ionicons name="cellular" size={18} color="rgba(255,255,255,0.85)" />
-        </View>
-      </View>
-
-      {/* Card Footer */}
-      <View style={styles.footer}>
-        <View style={styles.footerLeft}>
-          <Text style={styles.cameraName}>{name}</Text>
-          <View style={styles.metaRow}>
-            <View
-              style={[styles.signalDot, { backgroundColor: signalColor }]}
-            />
-            <Text style={styles.metaText}>
-              Signal: {signal} • {resolution}
+        {riskStatus !== "unknown" && (
+          <View
+            style={[
+              styles.statusBadge,
+              riskStatus === "low" && styles.statusBadgeLow,
+              riskStatus === "medium" && styles.statusBadgeMedium,
+              riskStatus === "danger" && styles.statusBadgeDanger,
+            ]}
+          >
+            <View style={styles.statusDot} />
+            <Text style={styles.statusText}>
+              {riskStatus === "low" && "LOW RISK"}
+              {riskStatus === "medium" && "MEDIUM RISK"}
+              {riskStatus === "danger" && "DANGER"}
             </Text>
           </View>
-        </View>
-        <TouchableOpacity style={styles.settingsButton} activeOpacity={0.7}>
-          <Ionicons name="settings-outline" size={20} color={Colors.primary} />
-        </TouchableOpacity>
+        )}
       </View>
+      <View style={[styles.signalIcon, { marginTop: overlayTopInset }]}>
+        <Ionicons name="cellular" size={18} color="rgba(255,255,255,0.85)" />
+      </View>
+
+      {fullscreen && (
+        <TouchableOpacity
+          style={[styles.closeButton, { top: insets.top + 8 }]}
+          onPress={() => setIsFullscreen(false)}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="close" size={20} color={Colors.white} />
+        </TouchableOpacity>
+      )}
     </View>
+    );
+  };
+
+  return (
+    <>
+      <View style={styles.card}>
+        <TouchableOpacity activeOpacity={0.95} onPress={() => setIsFullscreen(true)}>
+          {renderPreview(false)}
+        </TouchableOpacity>
+
+        {/* Card Footer */}
+        <View style={styles.footer}>
+          <View style={styles.footerLeft}>
+            <Text style={styles.cameraName}>{name}</Text>
+            <View style={styles.metaRow}>
+              <View
+                style={[styles.signalDot, { backgroundColor: signalColor }]}
+              />
+              <Text style={styles.metaText}>
+                Signal: {signal} • {resolution}
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.settingsButton} activeOpacity={0.7}>
+            <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Modal
+        visible={isFullscreen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setIsFullscreen(false)}
+      >
+        <Pressable
+          style={styles.fullscreenBackdrop}
+          onPress={() => setIsFullscreen(false)}
+        >
+          <Pressable style={styles.fullscreenContent} onPress={() => {}}>
+            {renderPreview(true)}
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </>
   );
 }
 
@@ -209,6 +255,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     padding: 12,
+  },
+  feedPreviewFullscreen: {
+    flex: 1,
+    height: undefined,
+    paddingTop: 12,
   },
   liveBadge: {
     flexDirection: "row",
@@ -267,6 +318,17 @@ const styles = StyleSheet.create({
   signalIcon: {
     alignSelf: "flex-end",
   },
+  closeButton: {
+    position: "absolute",
+    top: 14,
+    right: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   footer: {
     flexDirection: "row",
     alignItems: "center",
@@ -305,5 +367,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.border,
     justifyContent: "center",
     alignItems: "center",
+  },
+  fullscreenBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+  },
+  fullscreenContent: {
+    flex: 1,
   },
 });
