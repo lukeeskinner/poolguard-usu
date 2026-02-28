@@ -25,17 +25,26 @@ _previous_warning_level = None
 def inference_loop():
     """
     Runs inference in a background thread, completely decoupled from streaming.
-    Always processes the latest frame; intermediate frames are dropped if inference
-    is slower than the camera capture rate.
+    Iterates through pre-loaded frames sequentially by index so every loop hits
+    the same frames in the same order, keeping the model cache valid.
     """
     global _latest_result, _latest_frame_bytes, _previous_warning_level
+
+    # Wait until frames are available
+    while camera.get_frame_count() == 0:
+        time.sleep(0.01)
+
+    frame_interval = 1 / 10
+    idx = 0
     while True:
-        frame = camera.get_latest_frame()
-        if frame is None:
-            time.sleep(0.001)
-            continue
+        frame_start = time.monotonic()
+
+        frame = camera.get_frame(idx)
+        idx = (idx + 1) % camera.get_frame_count()
 
         result = next_frame(frame)
+        if result is None:
+            continue
         print(result.image)
 
         img_bytes = base64.b64decode(result.image)
@@ -52,6 +61,11 @@ def inference_loop():
                 'timestamp': time.time(),
             })
         _previous_warning_level = current_level
+
+        elapsed = time.monotonic() - frame_start
+        sleep_time = frame_interval - elapsed
+        if sleep_time > 0:
+            time.sleep(sleep_time)
 
 
 _inference_thread = threading.Thread(target=inference_loop, daemon=True)

@@ -8,7 +8,8 @@ import {
 import EmergencyAlertModal from "@/components/EmergencyAlertModal";
 import { io, Socket } from "socket.io-client";
 
-const SERVER_URL = "http://144.39.217.106:5001";
+const SERVER_URL =
+  "https://respondent-dialogue-thee-motel.trycloudflare.com:5001";
 
 export default function RootLayout() {
   const router = useRouter();
