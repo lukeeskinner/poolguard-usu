@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
 } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 
@@ -18,6 +18,8 @@ interface CameraFeedCardProps {
   streamUrl?: string;
 }
 
+const FRAME_DELAY_MS = 150; // ~6 fps — smooth without tearing
+
 export default function CameraFeedCard({
   name,
   signal,
@@ -26,23 +28,44 @@ export default function CameraFeedCard({
   placeholderColor,
   streamUrl,
 }: CameraFeedCardProps) {
-  const [frameUri, setFrameUri] = useState<string | null>(null);
+  // shownUri: the last fully-loaded frame — always visible, never flashes
+  const [shownUri, setShownUri] = useState<string | null>(null);
+  // loadingUri: the next frame loading silently in the background
+  const [loadingUri, setLoadingUri] = useState<string | null>(null);
+
   const activeRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const queueNext = useCallback(() => {
+    if (!activeRef.current || !streamUrl) return;
+    timerRef.current = setTimeout(() => {
+      if (activeRef.current && streamUrl) {
+        setLoadingUri(`${streamUrl}?t=${Date.now()}`);
+      }
+    }, FRAME_DELAY_MS);
+  }, [streamUrl]);
 
   useEffect(() => {
     if (!streamUrl) return;
     activeRef.current = true;
-    // Kick off the first frame immediately
-    setFrameUri(`${streamUrl}?t=${Date.now()}`);
+    // kick off the first frame
+    setLoadingUri(`${streamUrl}?t=${Date.now()}`);
     return () => {
       activeRef.current = false;
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [streamUrl]);
 
-  const fetchNextFrame = () => {
-    if (!activeRef.current || !streamUrl) return;
-    setFrameUri(`${streamUrl}?t=${Date.now()}`);
-  };
+  // Called when the hidden loading image finishes — promote it to shown
+  const onFrameReady = useCallback(() => {
+    setShownUri(loadingUri);
+    queueNext();
+  }, [loadingUri, queueNext]);
+
+  // On error just retry after a short delay
+  const onFrameError = useCallback(() => {
+    queueNext();
+  }, [queueNext]);
 
   const signalColor =
     signal === "Excellent"
@@ -55,15 +78,29 @@ export default function CameraFeedCard({
     <View style={styles.card}>
       {/* Feed Preview */}
       <View style={[styles.feedPreview, { backgroundColor: placeholderColor }]}>
-        {frameUri && (
+
+        {/* Layer 1: last good frame — always visible, never re-fetches */}
+        {shownUri && (
           <Image
-            source={{ uri: frameUri }}
+            source={{ uri: shownUri }}
             style={StyleSheet.absoluteFillObject}
-            resizeMode="cover"
-            onLoad={fetchNextFrame}
-            onError={fetchNextFrame}
+            contentFit="contain"
+            cachePolicy="memory"
           />
         )}
+
+        {/* Layer 2: next frame loading silently behind the scenes */}
+        {loadingUri && (
+          <Image
+            source={{ uri: loadingUri }}
+            style={[StyleSheet.absoluteFillObject, { opacity: 0 }]}
+            contentFit="contain"
+            cachePolicy="memory"
+            onLoad={onFrameReady}
+            onError={onFrameError}
+          />
+        )}
+
         {isLive && (
           <View style={styles.liveBadge}>
             <View style={styles.liveDot} />
