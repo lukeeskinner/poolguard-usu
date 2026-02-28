@@ -72,13 +72,13 @@ function SettingItem({
         <Switch
           value={toggleValue}
           onValueChange={onToggleChange}
-          trackColor={{ false: "#D1D5DB", true: "#3B82F6" }}
+          trackColor={{ false: Colors.border, true: Colors.primary }}
           thumbColor="#FFFFFF"
-          ios_backgroundColor="#D1D5DB"
+          ios_backgroundColor={Colors.border}
         />
       )}
       {showChevron && (
-        <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+        <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
       )}
     </TouchableOpacity>
   );
@@ -109,7 +109,7 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton}>
-          <Ionicons name="chevron-back" size={28} color="#3B82F6" />
+          <Ionicons name="chevron-back" size={28} color={Colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>System Settings</Text>
         <View style={styles.backButton} />
@@ -161,7 +161,7 @@ export default function SettingsScreen() {
             onPress={() => router.push("/(tabs)/emergency")}
           >
             <Text style={styles.linkButtonText}>Manage Emergency Contacts</Text>
-            <Ionicons name="chevron-forward" size={18} color="#3B82F6" />
+            <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
           </TouchableOpacity>
         </SettingSection>
 
@@ -295,17 +295,17 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: Colors.border,
   },
   backButton: {
     width: 40,
@@ -328,17 +328,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#6B7280",
+    color: Colors.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.5,
     paddingHorizontal: 20,
     marginBottom: 8,
   },
   sectionContent: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.cardBackground,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.border,
   },
   settingItem: {
     flexDirection: "row",
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: Colors.border,
   },
   settingLeft: {
     flexDirection: "row",
@@ -358,13 +358,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: "#EFF6FF",
+    backgroundColor: Colors.tipBackground,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   iconContainerDestructive: {
-    backgroundColor: "#FEE2E2",
+    backgroundColor: "#3D1010",
   },
   settingText: {
     flex: 1,
@@ -375,11 +375,11 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   settingTitleDestructive: {
-    color: "#DC2626",
+    color: "#EF4444",
   },
   settingSubtitle: {
     fontSize: 13,
-    color: "#6B7280",
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   linkButton: {
@@ -388,12 +388,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.cardBackground,
   },
   linkButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#3B82F6",
+    color: Colors.primary,
   },
   versionContainer: {
     alignItems: "center",
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: 12,
-    color: "#9CA3AF",
+    color: Colors.textMuted,
     marginTop: 2,
   },
 });

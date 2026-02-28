@@ -135,14 +135,14 @@ export default function CameraFeedCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.cardBackground,
     borderRadius: 16,
     marginHorizontal: 16,
     marginBottom: 14,
     overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
   },
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.primaryLight,
+    backgroundColor: Colors.border,
     justifyContent: "center",
     alignItems: "center",
   },

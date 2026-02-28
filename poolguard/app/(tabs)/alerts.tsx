@@ -284,7 +284,7 @@ export default function AlertsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: "row",
@@ -292,9 +292,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: Colors.border,
   },
   headerButton: {
     padding: 4,
@@ -310,12 +310,12 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 13,
-    color: "#6B7280",
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   filterContainer: {
     flexDirection: "row",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 12,
@@ -325,34 +325,34 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: "center",
     borderRadius: 8,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.tipBackground,
   },
   filterTabActive: {
-    backgroundColor: "#EFF6FF",
+    backgroundColor: Colors.primary,
   },
   filterText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#6B7280",
+    color: Colors.textMuted,
   },
   filterTextActive: {
-    color: "#2563EB",
+    color: Colors.white,
   },
   scrollView: {
     flex: 1,
   },
   alertCard: {
     flexDirection: "row",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.cardBackground,
     marginHorizontal: 16,
     marginTop: 16,
     borderRadius: 12,
     padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   alertContent: {
     flex: 1,
@@ -378,12 +378,12 @@ const styles = StyleSheet.create({
   },
   alertTime: {
     fontSize: 14,
-    color: "#6B7280",
+    color: Colors.textSecondary,
     marginBottom: 2,
   },
   alertDescription: {
     fontSize: 14,
-    color: "#6B7280",
+    color: Colors.textSecondary,
     marginBottom: 12,
   },
   actionButton: {
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#DC2626",
   },
   actionButtonYellow: {
-    backgroundColor: "#FEF3C7",
+    backgroundColor: "#7A3B00",
   },
   actionButtonIcon: {
     marginRight: 6,
@@ -407,12 +407,13 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 15,
     fontWeight: "600",
+    color: Colors.textPrimary,
   },
   actionButtonTextWhite: {
     color: "#FFFFFF",
   },
   actionButtonTextDark: {
-    color: "#92400E",
+    color: "#FCD34D",
   },
   alertImage: {
     width: 80,
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.tipBackground,
     justifyContent: "center",
     alignItems: "center",
   },

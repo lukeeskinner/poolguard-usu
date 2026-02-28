@@ -12,7 +12,8 @@ export default function LiveFeedHeader({ activeCount }: LiveFeedHeaderProps) {
     <View style={styles.container}>
       <Text style={styles.title}>Live Feeds</Text>
       <View style={styles.badge}>
-        <Text style={styles.badgeText}>{activeCount} Active</Text>
+        <View style={styles.dot} />
+        <Text style={styles.badgeText}>{activeCount} ONLINE</Text>
       </View>
     </View>
   );
@@ -34,14 +35,25 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   badge: {
-    backgroundColor: Colors.primaryLight,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: Colors.tipBackground,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.primary,
   },
   badgeText: {
     fontSize: 13,
     fontWeight: "600",
     color: Colors.primary,
+  },
+  dot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: Colors.live,
   },
 });
