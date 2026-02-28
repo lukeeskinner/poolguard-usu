@@ -17,26 +17,15 @@ import {
 } from "@/utils/alertStore";
 import { sendEmergencyNotification } from "@/utils/notifications";
 
-type FilterType = "all" | "highRisk" | "emergency";
-
 export default function AlertsScreen() {
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [alerts, setAlerts] = useState<AppAlert[]>(getAlerts);
 
   useEffect(() => {
-    return subscribeAlerts(() => setAlerts([...getAlerts()]));
+    const unsubAlerts = subscribeAlerts(() => setAlerts([...getAlerts()]));
+    return () => {
+      unsubAlerts();
+    };
   }, []);
-
-  const getFilteredAlerts = () => {
-    if (activeFilter === "all") return alerts;
-    if (activeFilter === "emergency")
-      return alerts.filter((a) => a.severity === "emergency");
-    if (activeFilter === "highRisk")
-      return alerts.filter(
-        (a) => a.severity === "emergency" || a.severity === "high",
-      );
-    return alerts;
-  };
 
   const getSeverityColor = (severity: AlertSeverity) => {
     switch (severity) {
@@ -68,7 +57,7 @@ export default function AlertsScreen() {
     }
   };
 
-  const filtered = getFilteredAlerts();
+  const filtered = alerts;
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
@@ -80,58 +69,6 @@ export default function AlertsScreen() {
           <Text style={styles.headerSubtitle}>PoolGuard AI • Home Pool</Text>
         </View>
         <View style={styles.headerButton} />
-      </View>
-
-      {/* Filter Tabs */}
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[
-            styles.filterTab,
-            activeFilter === "all" && styles.filterTabActive,
-          ]}
-          onPress={() => setActiveFilter("all")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              activeFilter === "all" && styles.filterTextActive,
-            ]}
-          >
-            All
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterTab,
-            activeFilter === "highRisk" && styles.filterTabActive,
-          ]}
-          onPress={() => setActiveFilter("highRisk")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              activeFilter === "highRisk" && styles.filterTextActive,
-            ]}
-          >
-            High Risk
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterTab,
-            activeFilter === "emergency" && styles.filterTabActive,
-          ]}
-          onPress={() => setActiveFilter("emergency")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              activeFilter === "emergency" && styles.filterTextActive,
-            ]}
-          >
-            Emergency
-          </Text>
-        </TouchableOpacity>
       </View>
 
       {/* Test Notification Button */}
@@ -164,7 +101,7 @@ export default function AlertsScreen() {
             </Text>
           </View>
         ) : (
-          filtered.map((alert) => (
+          filtered.map((alert: AppAlert) => (
             <View key={alert.id} style={styles.alertCard}>
               <View style={styles.alertContent}>
                 <Text
@@ -247,31 +184,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textSecondary,
     marginTop: 2,
-  },
-  filterContainer: {
-    flexDirection: "row",
-    backgroundColor: Colors.background,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
-  },
-  filterTab: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: "center",
-    borderRadius: 8,
-    backgroundColor: Colors.tipBackground,
-  },
-  filterTabActive: {
-    backgroundColor: Colors.primary,
-  },
-  filterText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: Colors.textMuted,
-  },
-  filterTextActive: {
-    color: Colors.white,
   },
   scrollView: {
     flex: 1,

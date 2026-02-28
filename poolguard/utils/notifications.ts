@@ -108,21 +108,13 @@ export async function sendLocalNotification(
   });
 }
 
-export async function sendEmergencyNotification() {
+export function sendEmergencyNotification() {
+  // Fires the in-app EmergencyAlertModal via the alert store (subscribeEmergency in _layout.tsx).
+  // No system notification scheduled — the modal IS the alert when the app is open.
   addAlert({
     severity: "emergency",
     title: "🚨 Emergency: Possible Drowning Detected",
     description:
       "Emergency protocol initiated. Siren activated and emergency contacts notified.",
-  });
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "🚨 Emergency: Possible Drowning Detected",
-      body: "Emergency protocol initiated. Siren activated and emergency contacts notified.",
-      sound: true,
-      categoryIdentifier: "pool_alert",
-      data: { type: "emergency" },
-    },
-    trigger: null,
   });
 }

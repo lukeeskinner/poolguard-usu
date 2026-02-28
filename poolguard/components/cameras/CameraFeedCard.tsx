@@ -120,81 +120,84 @@ export default function CameraFeedCard({
     const overlayTopInset = fullscreen ? insets.top + 8 : 0;
 
     return (
-    <View
-      style={[
-        styles.feedPreview,
-        fullscreen && styles.feedPreviewFullscreen,
-        { backgroundColor: fullscreen ? "#000000" : placeholderColor },
-      ]}
-    >
-      {/* Layer 1: last good frame — always visible, never re-fetches */}
-      {shownUri && (
-        <Image
-          source={{ uri: shownUri }}
-          style={StyleSheet.absoluteFillObject}
-          contentFit="contain"
-          cachePolicy="memory"
-        />
-      )}
-
-      {/* Layer 2: next frame loading silently behind the scenes */}
-      {loadingUri && (
-        <Image
-          source={{ uri: loadingUri }}
-          style={[StyleSheet.absoluteFillObject, { opacity: 0 }]}
-          contentFit="contain"
-          cachePolicy="memory"
-          onLoad={onFrameReady}
-          onError={onFrameError}
-        />
-      )}
-
-      <View style={[styles.leftOverlay, { marginTop: overlayTopInset }]}>
-        {isLive && (
-          <View style={styles.liveBadge}>
-            <View style={styles.liveDot} />
-            <Text style={styles.liveText}>LIVE</Text>
-          </View>
+      <View
+        style={[
+          styles.feedPreview,
+          fullscreen && styles.feedPreviewFullscreen,
+          { backgroundColor: fullscreen ? "#000000" : placeholderColor },
+        ]}
+      >
+        {/* Layer 1: last good frame — always visible, never re-fetches */}
+        {shownUri && (
+          <Image
+            source={{ uri: shownUri }}
+            style={StyleSheet.absoluteFillObject}
+            contentFit="contain"
+            cachePolicy="memory"
+          />
         )}
-        {riskStatus !== "unknown" && (
-          <View
-            style={[
-              styles.statusBadge,
-              riskStatus === "low" && styles.statusBadgeLow,
-              riskStatus === "medium" && styles.statusBadgeMedium,
-              riskStatus === "danger" && styles.statusBadgeDanger,
-            ]}
+
+        {/* Layer 2: next frame loading silently behind the scenes */}
+        {loadingUri && (
+          <Image
+            source={{ uri: loadingUri }}
+            style={[StyleSheet.absoluteFillObject, { opacity: 0 }]}
+            contentFit="contain"
+            cachePolicy="memory"
+            onLoad={onFrameReady}
+            onError={onFrameError}
+          />
+        )}
+
+        <View style={[styles.leftOverlay, { marginTop: overlayTopInset }]}>
+          {isLive && (
+            <View style={styles.liveBadge}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>LIVE</Text>
+            </View>
+          )}
+          {riskStatus !== "unknown" && (
+            <View
+              style={[
+                styles.statusBadge,
+                riskStatus === "low" && styles.statusBadgeLow,
+                riskStatus === "medium" && styles.statusBadgeMedium,
+                riskStatus === "danger" && styles.statusBadgeDanger,
+              ]}
+            >
+              <View style={styles.statusDot} />
+              <Text style={styles.statusText}>
+                {riskStatus === "low" && "LOW RISK"}
+                {riskStatus === "medium" && "MEDIUM RISK"}
+                {riskStatus === "danger" && "DANGER"}
+              </Text>
+            </View>
+          )}
+        </View>
+        <View style={[styles.signalIcon, { marginTop: overlayTopInset }]}>
+          <Ionicons name="cellular" size={18} color="rgba(255,255,255,0.85)" />
+        </View>
+
+        {fullscreen && (
+          <TouchableOpacity
+            style={[styles.closeButton, { top: insets.top + 8 }]}
+            onPress={() => setIsFullscreen(false)}
+            activeOpacity={0.8}
           >
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>
-              {riskStatus === "low" && "LOW RISK"}
-              {riskStatus === "medium" && "MEDIUM RISK"}
-              {riskStatus === "danger" && "DANGER"}
-            </Text>
-          </View>
+            <Ionicons name="close" size={20} color={Colors.white} />
+          </TouchableOpacity>
         )}
       </View>
-      <View style={[styles.signalIcon, { marginTop: overlayTopInset }]}>
-        <Ionicons name="cellular" size={18} color="rgba(255,255,255,0.85)" />
-      </View>
-
-      {fullscreen && (
-        <TouchableOpacity
-          style={[styles.closeButton, { top: insets.top + 8 }]}
-          onPress={() => setIsFullscreen(false)}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="close" size={20} color={Colors.white} />
-        </TouchableOpacity>
-      )}
-    </View>
     );
   };
 
   return (
     <>
       <View style={styles.card}>
-        <TouchableOpacity activeOpacity={0.95} onPress={() => setIsFullscreen(true)}>
+        <TouchableOpacity
+          activeOpacity={0.95}
+          onPress={() => setIsFullscreen(true)}
+        >
           {renderPreview(false)}
         </TouchableOpacity>
 
@@ -212,7 +215,11 @@ export default function CameraFeedCard({
             </View>
           </View>
           <TouchableOpacity style={styles.settingsButton} activeOpacity={0.7}>
-            <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+            <Ionicons
+              name="settings-outline"
+              size={20}
+              color={Colors.primary}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -242,10 +249,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 14,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+    shadowColor: "#fff",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
     elevation: 3,
   },
   feedPreview: {
