@@ -25,7 +25,7 @@ class FrameResult:
 # Paste the URL Modal gave you when you ran `modal deploy deploy_a100.py`
 MODAL_API_URL = "https://u1446904--pool-safety-a100-safetycalculator-next-frame.modal.run" 
 
-CACHE_MAX_SIZE = 50
+CACHE_MAX_SIZE = 500
 _frame_cache = OrderedDict()
 
 # Reuse TCP connection across calls — cuts 30–50ms per frame
