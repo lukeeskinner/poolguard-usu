@@ -9,7 +9,10 @@ import numpy as np
 from transformers import DepthProImageProcessorFast, DepthProForDepthEstimation, Sam3Processor, Sam3Model
 from dataclasses import dataclass
 from typing import List
+from dotenv import load_dotenv
+from huggingface_hub import login
 
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
 @dataclass
 class Child:
@@ -33,7 +36,16 @@ class FrameResult:
             "warningLevel": self.warningLevel,
         }
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+hf_token = os.environ.get("HF_API_KEY")
+login(token=hf_token)
+
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+else:
+    device = torch.device("cpu")
 
 depth_processor = DepthProImageProcessorFast.from_pretrained("apple/DepthPro-hf")
 depth_model = DepthProForDepthEstimation.from_pretrained("apple/DepthPro-hf").to(device)
@@ -41,20 +53,13 @@ depth_model = DepthProForDepthEstimation.from_pretrained("apple/DepthPro-hf").to
 sam_model = Sam3Model.from_pretrained("facebook/sam3").to(device)
 sam_processor = Sam3Processor.from_pretrained("facebook/sam3")
 
-try:
-    from huggingface_hub import login
-    hf_token = userdata.get(os.environ.get("HF_API_KEY"))
-    login(token=hf_token)
-except Exception as e:
-    print("Add the HF_API_KEY environment variable")
-
 def get_depth_raw_output(image):
-    inputs = image_processor(images=image, return_tensors="pt").to(device)
+    inputs = depth_processor(images=image, return_tensors="pt").to(device)
 
     with torch.no_grad():
         outputs = depth_model(**inputs)
 
-    post_processed_output = image_processor.post_process_depth_estimation(
+    post_processed_output = depth_processor.post_process_depth_estimation(
         outputs, target_sizes=[(image.height, image.width)],
     )[0]
 
@@ -207,11 +212,7 @@ def image_to_base64(pil_image, image_format="JPEG"):
     return b64_string
 
 def next_frame(image) -> FrameResult:
-    if "," in image:
-        image = image.split(",")[1]
-
-    image_bytes = base64.b64decode(image)
-    image = Image.open(BytesIO(image_bytes))
+    image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
     depth = get_depth_raw_output(image)
     kids = get_sam_raw_output(image, "kid")
