@@ -8,6 +8,7 @@ import {
   Linking,
   FlatList,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import * as Contacts from "expo-contacts";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,7 +16,6 @@ import { Colors } from "@/constants/Colors";
 
 interface EmergencyAlertModalProps {
   visible: boolean;
-  onViewLive: () => void;
   onDismiss: () => void;
 }
 
@@ -27,7 +27,6 @@ interface Contact {
 
 export default function EmergencyAlertModal({
   visible,
-  onViewLive,
   onDismiss,
 }: EmergencyAlertModalProps) {
   const [showContacts, setShowContacts] = useState(false);
@@ -72,94 +71,89 @@ export default function EmergencyAlertModal({
       transparent
       animationType="fade"
       statusBarTranslucent
+      onRequestClose={onDismiss}
     >
-      <View style={styles.overlay}>
-        <View style={styles.card}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.appIconWrapper}>
-              <Text style={styles.appIconText}>✱</Text>
-            </View>
-            <View style={styles.headerText}>
-              <Text style={styles.appName}>POOLGUARD AI</Text>
-            </View>
-            <Text style={styles.timestamp}>now</Text>
-          </View>
-
-          {/* Body */}
-          <View style={styles.body}>
-            <Text style={styles.title}>
-              🚨 Emergency: Possible Drowning Detected
-            </Text>
-            <Text style={styles.message}>
-              Emergency protocol initiated. Siren activated and emergency
-              contacts notified.
-            </Text>
-          </View>
-
-          {/* Contact Picker */}
-          {showContacts && (
-            <View style={styles.contactList}>
-              <View style={styles.contactListHeader}>
-                <Text style={styles.contactListTitle}>Select a contact</Text>
-                <TouchableOpacity onPress={() => setShowContacts(false)}>
-                  <Ionicons name="close" size={20} color="#6B6B6B" />
-                </TouchableOpacity>
+      <Pressable style={styles.overlay} onPress={onDismiss}>
+        <Pressable>
+          <View style={styles.card}>
+            {/* Header */}
+            <View style={styles.header}>
+              <View style={styles.appIconWrapper}>
+                <Text style={styles.appIconText}>✱</Text>
               </View>
-              {loading ? (
-                <ActivityIndicator
-                  size="small"
-                  color={Colors.primary}
-                  style={{ padding: 16 }}
-                />
-              ) : (
-                <FlatList
-                  data={contacts}
-                  keyExtractor={(item) => item.id}
-                  style={styles.flatList}
-                  keyboardShouldPersistTaps="handled"
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={styles.contactRow}
-                      onPress={() => handleCallContact(item.phone)}
-                      activeOpacity={0.7}
-                    >
-                      <View style={styles.contactAvatar}>
-                        <Text style={styles.contactInitial}>
-                          {item.name.charAt(0).toUpperCase()}
-                        </Text>
-                      </View>
-                      <View>
-                        <Text style={styles.contactName}>{item.name}</Text>
-                        <Text style={styles.contactPhone}>{item.phone}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                />
-              )}
+              <View style={styles.headerText}>
+                <Text style={styles.appName}>POOLGUARD AI</Text>
+              </View>
+              <Text style={styles.timestamp}>now</Text>
             </View>
-          )}
 
-          {/* Action Buttons */}
-          {!showContacts && (
-            <View style={styles.actions}>
-              <TouchableOpacity
-                style={styles.emergencyButton}
-                onPress={handlePickContact}
-                activeOpacity={0.85}
-              >
-                <Ionicons name="call" size={16} color="#fff" />
-                <Text style={styles.emergencyText}>Call Emergency Contact</Text>
-              </TouchableOpacity>
-              <View style={styles.secondaryRow}>
+            {/* Body */}
+            <View style={styles.body}>
+              <Text style={styles.title}>
+                🚨 Emergency: Possible Drowning Detected
+              </Text>
+              <Text style={styles.message}>
+                Emergency protocol initiated. Siren activated and emergency
+                contacts notified.
+              </Text>
+            </View>
+
+            {/* Contact Picker */}
+            {showContacts && (
+              <View style={styles.contactList}>
+                <View style={styles.contactListHeader}>
+                  <Text style={styles.contactListTitle}>Select a contact</Text>
+                  <TouchableOpacity onPress={() => setShowContacts(false)}>
+                    <Ionicons name="close" size={20} color="#6B6B6B" />
+                  </TouchableOpacity>
+                </View>
+                {loading ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={Colors.primary}
+                    style={{ padding: 16 }}
+                  />
+                ) : (
+                  <FlatList
+                    data={contacts}
+                    keyExtractor={(item) => item.id}
+                    style={styles.flatList}
+                    keyboardShouldPersistTaps="handled"
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={styles.contactRow}
+                        onPress={() => handleCallContact(item.phone)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.contactAvatar}>
+                          <Text style={styles.contactInitial}>
+                            {item.name.charAt(0).toUpperCase()}
+                          </Text>
+                        </View>
+                        <View>
+                          <Text style={styles.contactName}>{item.name}</Text>
+                          <Text style={styles.contactPhone}>{item.phone}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  />
+                )}
+              </View>
+            )}
+
+            {/* Action Buttons */}
+            {!showContacts && (
+              <View style={styles.actions}>
                 <TouchableOpacity
-                  style={styles.secondaryButton}
-                  onPress={onViewLive}
+                  style={styles.emergencyButton}
+                  onPress={handlePickContact}
                   activeOpacity={0.85}
                 >
-                  <Text style={styles.secondaryText}>View Live</Text>
+                  <Ionicons name="call" size={16} color="#fff" />
+                  <Text style={styles.emergencyText}>
+                    Call Emergency Contact
+                  </Text>
                 </TouchableOpacity>
-                <View style={styles.secondaryDivider} />
                 <TouchableOpacity
                   style={styles.secondaryButton}
                   onPress={onDismiss}
@@ -168,10 +162,10 @@ export default function EmergencyAlertModal({
                   <Text style={styles.secondaryText}>OK</Text>
                 </TouchableOpacity>
               </View>
-            </View>
-          )}
-        </View>
-      </View>
+            )}
+          </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }
@@ -300,11 +294,12 @@ const styles = StyleSheet.create({
     borderLeftColor: "rgba(0,0,0,0.12)",
   },
   secondaryButton: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#E5E5EA",
-    paddingVertical: 13,
+    paddingVertical: 14,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.12)",
   },
   okButton: {
     borderTopWidth: 1,

@@ -1,22 +1,36 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 
 interface ScreenHeaderProps {
   title: string;
   subtitle: string;
+  showMiraLogo?: boolean;
 }
 
-export default function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
+export default function ScreenHeader({
+  title,
+  subtitle,
+  showMiraLogo,
+}: ScreenHeaderProps) {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} activeOpacity={0.7}>
-        <Ionicons name="chevron-back" size={22} color={Colors.textPrimary} />
-      </TouchableOpacity>
+      <View style={styles.backButton} />
 
       <View style={styles.titleBlock}>
-        <Text style={styles.title}>{title}</Text>
+        {showMiraLogo ? (
+          <View style={styles.logoRow}>
+            <Image
+              source={require("@/assets/images/icon.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.miraText}>Mira</Text>
+          </View>
+        ) : (
+          <Text style={styles.title}>{title}</Text>
+        )}
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
 
@@ -71,5 +85,21 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.tipBackground,
     justifyContent: "center",
     alignItems: "center",
+  },
+  logoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  logo: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+  },
+  miraText: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: Colors.textPrimary,
+    letterSpacing: -0.5,
   },
 });

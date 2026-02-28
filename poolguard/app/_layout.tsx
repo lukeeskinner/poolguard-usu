@@ -7,6 +7,7 @@ import {
 } from "@/utils/notifications";
 import EmergencyAlertModal from "@/components/EmergencyAlertModal";
 import { io, Socket } from "socket.io-client";
+import { subscribeEmergency } from "@/utils/alertStore";
 
 const SERVER_URL = "https://vessel-foot-pot-sol.trycloudflare.com";
 
@@ -25,14 +26,12 @@ export default function RootLayout() {
     registerForPushNotifications();
     registerNotificationCategories();
 
-    // Show in-app modal when notification is received while app is open
+    const unsubEmergency = subscribeEmergency(() => setAlertVisible(true));
+
+    // Handle notification action buttons tapped from system tray
     notificationListener.current =
       Notifications.addNotificationReceivedListener(() => {
-        const now = Date.now();
-        if (now - lastAlertTimeRef.current >= ALERT_COOLDOWN_MS) {
-          lastAlertTimeRef.current = now;
-          setAlertVisible(true);
-        }
+        // No-op: in-app modal is handled by subscribeEmergency in alertStore
       });
 
     responseListener.current =
@@ -61,6 +60,7 @@ export default function RootLayout() {
       notificationListener.current?.remove();
       responseListener.current?.remove();
       socket.disconnect();
+      unsubEmergency();
     };
   }, []);
 
@@ -71,10 +71,6 @@ export default function RootLayout() {
       </Stack>
       <EmergencyAlertModal
         visible={alertVisible}
-        onViewLive={() => {
-          setAlertVisible(false);
-          router.push("/(tabs)/home");
-        }}
         onDismiss={() => setAlertVisible(false)}
       />
     </>

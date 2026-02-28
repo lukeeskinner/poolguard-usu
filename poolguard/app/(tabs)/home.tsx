@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 import ScreenHeader from "@/components/cameras/ScreenHeader";
 import LiveFeedHeader from "@/components/cameras/LiveFeedHeader";
 import CameraFeedCard from "@/components/cameras/CameraFeedCard";
@@ -32,42 +33,36 @@ const CAMERAS = [
 ];
 
 export default function CamerasScreen() {
-  const [selectedCameraId, setSelectedCameraId] = useState(CAMERAS[0].id);
-  const selectedCamera =
-    CAMERAS.find((camera) => camera.id === selectedCameraId) ?? CAMERAS[0];
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedCamera = CAMERAS[selectedIndex];
+
+  const goPrev = () =>
+    setSelectedIndex((i) => (i - 1 + CAMERAS.length) % CAMERAS.length);
+  const goNext = () => setSelectedIndex((i) => (i + 1) % CAMERAS.length);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <View style={styles.container}>
-        <ScreenHeader title="PoolGuard AI" subtitle="Camera Management" />
+        <ScreenHeader
+          title="PoolGuard AI"
+          subtitle="Camera Management"
+          showMiraLogo
+        />
         <View style={styles.content}>
           <LiveFeedHeader
             activeCount={CAMERAS.filter((c) => c.isLive).length}
           />
 
-          <View style={styles.videoTabs}>
-            {CAMERAS.map((camera) => {
-              const isActive = camera.id === selectedCamera.id;
-              return (
-                <TouchableOpacity
-                  key={camera.id}
-                  style={[styles.videoTab, isActive && styles.videoTabActive]}
-                  onPress={() => setSelectedCameraId(camera.id)}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    style={[
-                      styles.videoTabText,
-                      isActive && styles.videoTabTextActive,
-                    ]}
-                  >
-                    {camera.name}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+          {/* Camera name above the feed */}
+          <View style={styles.cameraNameRow}>
+            <View style={styles.liveDot} />
+            <Text style={styles.cameraName}>{selectedCamera.name}</Text>
+            <Text style={styles.cameraCount}>
+              {selectedIndex + 1} / {CAMERAS.length}
+            </Text>
           </View>
 
+          {/* Video feed */}
           <View style={styles.centerCard}>
             <CameraFeedCard
               key={selectedCamera.id}
@@ -78,6 +73,57 @@ export default function CamerasScreen() {
               placeholderColor={selectedCamera.placeholderColor}
               streamUrl={selectedCamera.streamUrl}
             />
+          </View>
+
+          {/* Arrow navigation below the feed */}
+          <View style={styles.navBar}>
+            <TouchableOpacity
+              style={[
+                styles.navArrow,
+                CAMERAS.length <= 1 && styles.navArrowDisabled,
+              ]}
+              onPress={goPrev}
+              disabled={CAMERAS.length <= 1}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={
+                  CAMERAS.length <= 1 ? Colors.textMuted : Colors.textPrimary
+                }
+              />
+            </TouchableOpacity>
+
+            {/* Dot indicators */}
+            <View style={styles.dotRow}>
+              {CAMERAS.map((_, i) => (
+                <TouchableOpacity
+                  key={i}
+                  onPress={() => setSelectedIndex(i)}
+                  style={[styles.dot, i === selectedIndex && styles.dotActive]}
+                  activeOpacity={0.7}
+                />
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.navArrow,
+                CAMERAS.length <= 1 && styles.navArrowDisabled,
+              ]}
+              onPress={goNext}
+              disabled={CAMERAS.length <= 1}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="chevron-forward"
+                size={22}
+                color={
+                  CAMERAS.length <= 1 ? Colors.textMuted : Colors.textPrimary
+                }
+              />
+            </TouchableOpacity>
           </View>
 
           <AddCameraButton />
@@ -99,37 +145,81 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  videoTabs: {
+  // Camera name row above the feed
+  cameraNameRow: {
     flexDirection: "row",
-    marginHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 10,
-    backgroundColor: Colors.tipBackground,
-    borderRadius: 12,
-    padding: 4,
-    gap: 6,
-  },
-  videoTab: {
-    flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    paddingVertical: 10,
+    marginHorizontal: 16,
+    marginTop: 10,
+    marginBottom: 8,
+    gap: 8,
   },
-  videoTabActive: {
-    backgroundColor: Colors.primary,
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.live,
   },
-  videoTabText: {
-    color: Colors.textSecondary,
+  cameraName: {
+    flex: 1,
+    fontSize: 17,
+    fontWeight: "700",
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
+  },
+  cameraCount: {
     fontSize: 13,
-    fontWeight: "600",
-  },
-  videoTabTextActive: {
-    color: Colors.white,
+    color: Colors.textMuted,
+    fontWeight: "500",
   },
   centerCard: {
     flex: 1,
     justifyContent: "center",
-    paddingBottom: 12,
+    paddingBottom: 4,
+  },
+  // Arrow nav bar below the feed
+  navBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginHorizontal: 16,
+    marginTop: 10,
+    marginBottom: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+    backgroundColor: Colors.tipBackground,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  navArrow: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.cardBackground,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  navArrowDisabled: {
+    opacity: 0.3,
+  },
+  dotRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.border,
+  },
+  dotActive: {
+    width: 22,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.primary,
   },
 });

@@ -179,7 +179,7 @@ export default function EmergencyContactsScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="chevron-back" size={28} color="#3B82F6" />
+          <Ionicons name="chevron-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Emergency Contacts</Text>
         <View style={styles.backButton} />
@@ -189,7 +189,11 @@ export default function EmergencyContactsScreen() {
         {/* Info Banner */}
         <View style={styles.infoBanner}>
           <View style={styles.infoIconContainer}>
-            <Ionicons name="information-circle" size={24} color="#3B82F6" />
+            <Ionicons
+              name="information-circle"
+              size={24}
+              color={Colors.primary}
+            />
           </View>
           <Text style={styles.infoText}>
             These contacts will be notified immediately when a critical alert is
@@ -278,7 +282,7 @@ export default function EmergencyContactsScreen() {
 
           {/* Add Contact Button */}
           <TouchableOpacity style={styles.addButton} onPress={handleAddContact}>
-            <Ionicons name="add-circle" size={24} color="#3B82F6" />
+            <Ionicons name="add-circle" size={24} color={Colors.primary} />
             <Text style={styles.addButtonText}>Add Emergency Contact</Text>
           </TouchableOpacity>
         </View>
@@ -289,35 +293,47 @@ export default function EmergencyContactsScreen() {
           <View style={styles.notificationCard}>
             <TouchableOpacity style={styles.notificationOption}>
               <View style={styles.notificationLeft}>
-                <Ionicons name="call-outline" size={20} color="#3B82F6" />
+                <Ionicons
+                  name="call-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
                 <Text style={styles.notificationText}>Phone Call</Text>
               </View>
-              <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={24} color={Colors.live} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.notificationOption}>
               <View style={styles.notificationLeft}>
-                <Ionicons name="chatbubble-outline" size={20} color="#3B82F6" />
+                <Ionicons
+                  name="chatbubble-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
                 <Text style={styles.notificationText}>SMS Text</Text>
               </View>
-              <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={24} color={Colors.live} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.notificationOption}>
               <View style={styles.notificationLeft}>
                 <Ionicons
                   name="notifications-outline"
                   size={20}
-                  color="#3B82F6"
+                  color={Colors.primary}
                 />
                 <Text style={styles.notificationText}>Push Notification</Text>
               </View>
-              <Ionicons name="ellipse-outline" size={24} color="#D1D5DB" />
+              <Ionicons
+                name="ellipse-outline"
+                size={24}
+                color={Colors.border}
+              />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Response Time Info */}
         <View style={styles.responseCard}>
-          <Ionicons name="time-outline" size={20} color="#6B7280" />
+          <Ionicons name="time-outline" size={20} color={Colors.textMuted} />
           <Text style={styles.responseText}>
             Contacts are notified within{" "}
             <Text style={styles.responseBold}>2 seconds</Text> of alert
@@ -346,7 +362,7 @@ export default function EmergencyContactsScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Add Emergency Contact</Text>
               <TouchableOpacity onPress={handleCancelAdd}>
-                <Ionicons name="close" size={28} color="#6B7280" />
+                <Ionicons name="close" size={26} color={Colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
@@ -356,7 +372,11 @@ export default function EmergencyContactsScreen() {
                 style={styles.importButton}
                 onPress={handleImportContact}
               >
-                <Ionicons name="person-add-outline" size={20} color="#3B82F6" />
+                <Ionicons
+                  name="person-add-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
                 <Text style={styles.importButtonText}>
                   Import from Contacts
                 </Text>
@@ -373,7 +393,7 @@ export default function EmergencyContactsScreen() {
                 <TextInput
                   style={styles.formInput}
                   placeholder="Enter full name"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={Colors.textMuted}
                   value={newName}
                   onChangeText={setNewName}
                   autoCapitalize="words"
@@ -385,7 +405,7 @@ export default function EmergencyContactsScreen() {
                 <TextInput
                   style={styles.formInput}
                   placeholder="+1 (555) 123-4567"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={Colors.textMuted}
                   value={newPhone}
                   onChangeText={setNewPhone}
                   keyboardType="phone-pad"
@@ -397,7 +417,7 @@ export default function EmergencyContactsScreen() {
                 <TextInput
                   style={styles.formInput}
                   placeholder="e.g., Spouse, Neighbor, Friend"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={Colors.textMuted}
                   value={newRelationship}
                   onChangeText={setNewRelationship}
                   autoCapitalize="words"
@@ -408,7 +428,7 @@ export default function EmergencyContactsScreen() {
                 <Ionicons
                   name="information-circle-outline"
                   size={20}
-                  color="#6B7280"
+                  color={Colors.textMuted}
                 />
                 <Text style={styles.formInfoText}>
                   {contacts.length === 0
@@ -442,23 +462,25 @@ export default function EmergencyContactsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: Colors.border,
   },
   backButton: {
     width: 40,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: 20,
+    backgroundColor: Colors.tipBackground,
   },
   headerTitle: {
     fontSize: 18,
@@ -471,13 +493,13 @@ const styles = StyleSheet.create({
   },
   infoBanner: {
     flexDirection: "row",
-    backgroundColor: "#EFF6FF",
+    backgroundColor: Colors.tipBackground,
     marginHorizontal: 16,
     marginTop: 16,
     padding: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: "#3B82F6",
+    borderLeftColor: Colors.primary,
   },
   infoIconContainer: {
     marginRight: 12,
@@ -485,7 +507,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: "#1E40AF",
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   section: {
@@ -499,26 +521,26 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontSize: 12,
+    fontWeight: "700",
+    color: Colors.textMuted,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 1,
     paddingHorizontal: 16,
     marginBottom: 8,
   },
   contactCount: {
     fontSize: 13,
-    color: "#9CA3AF",
+    color: Colors.textSecondary,
     fontWeight: "600",
   },
   emergencyCard: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.cardBackground,
     marginHorizontal: 16,
     padding: 16,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#FEE2E2",
+    borderWidth: 1,
+    borderColor: "#3D1010",
   },
   emergencyLeft: {
     flexDirection: "row",
@@ -528,7 +550,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#FEE2E2",
+    backgroundColor: "#3D1010",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -537,51 +559,50 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   emergencyTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "700",
-    color: "#DC2626",
+    color: "#EF4444",
     marginBottom: 4,
   },
   emergencySubtitle: {
-    fontSize: 14,
-    color: "#6B7280",
+    fontSize: 13,
+    color: Colors.textSecondary,
     lineHeight: 18,
   },
   contactCard: {
     flexDirection: "row",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.cardBackground,
     marginHorizontal: 16,
-    marginBottom: 12,
+    marginBottom: 10,
     padding: 16,
     borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   contactLeft: {
     flexDirection: "row",
     flex: 1,
   },
   contactAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#E5E7EB",
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: Colors.tipBackground,
+    borderWidth: 1,
+    borderColor: Colors.border,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   contactAvatarPrimary: {
-    backgroundColor: "#FEF3C7",
+    backgroundColor: "#2A1F00",
     borderWidth: 2,
     borderColor: "#F59E0B",
   },
   contactInitial: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
-    color: "#374151",
+    color: Colors.textSecondary,
   },
   contactInfo: {
     flex: 1,
@@ -590,77 +611,86 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 4,
+    flexWrap: "wrap",
+    gap: 6,
   },
   contactName: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "700",
     color: Colors.textPrimary,
-    marginRight: 8,
   },
   primaryBadge: {
-    backgroundColor: "#FEF3C7",
-    paddingHorizontal: 8,
+    backgroundColor: "#2A1F00",
+    paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#F59E0B",
   },
   primaryBadgeText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "700",
-    color: "#92400E",
+    color: "#F59E0B",
     letterSpacing: 0.5,
   },
   contactPhone: {
-    fontSize: 15,
-    color: "#3B82F6",
+    fontSize: 14,
+    color: Colors.primary,
     marginBottom: 2,
+    fontWeight: "600",
   },
   contactRelationship: {
-    fontSize: 14,
-    color: "#6B7280",
+    fontSize: 13,
+    color: Colors.textSecondary,
   },
   contactActions: {
     flexDirection: "row",
-    gap: 8,
+    gap: 4,
+    alignItems: "center",
   },
   actionButton: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: 10,
+    backgroundColor: Colors.tipBackground,
   },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.white,
+    backgroundColor: "transparent",
     marginHorizontal: 16,
     marginTop: 8,
     padding: 16,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#3B82F6",
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
     borderStyle: "dashed",
   },
   addButtonText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
-    color: "#3B82F6",
+    color: Colors.primary,
     marginLeft: 8,
   },
   notificationCard: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.cardBackground,
     marginHorizontal: 16,
     borderRadius: 12,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   notificationOption: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: Colors.border,
   },
   notificationLeft: {
     flexDirection: "row",
@@ -668,31 +698,32 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   notificationText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
     color: Colors.textPrimary,
   },
   responseCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.tipBackground,
     marginHorizontal: 16,
     marginTop: 24,
     marginBottom: 40,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.border,
   },
   responseText: {
-    fontSize: 14,
-    color: "#6B7280",
+    fontSize: 13,
+    color: Colors.textSecondary,
     marginLeft: 12,
     flex: 1,
+    lineHeight: 18,
   },
   responseBold: {
     fontWeight: "700",
-    color: "#374151",
+    color: Colors.textPrimary,
   },
   modalContainer: {
     flex: 1,
@@ -700,12 +731,16 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   modalContent: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.cardBackground,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: Colors.border,
     maxHeight: "85%",
   },
   modalHeader: {
@@ -713,12 +748,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: 18,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: Colors.border,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
     color: Colors.textPrimary,
   },
@@ -730,18 +765,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#EFF6FF",
+    backgroundColor: Colors.tipBackground,
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#3B82F6",
+    borderWidth: 1,
+    borderColor: Colors.primary,
     marginBottom: 20,
   },
   importButtonText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
-    color: "#3B82F6",
+    color: Colors.primary,
     marginLeft: 8,
   },
   divider: {
@@ -752,46 +787,49 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: Colors.border,
   },
   dividerText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#9CA3AF",
+    fontSize: 11,
+    fontWeight: "700",
+    color: Colors.textMuted,
     paddingHorizontal: 12,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   formGroup: {
-    marginBottom: 20,
+    marginBottom: 18,
   },
   formLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: Colors.textPrimary,
+    fontSize: 13,
+    fontWeight: "700",
+    color: Colors.textSecondary,
     marginBottom: 8,
+    letterSpacing: 0.3,
   },
   formInput: {
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.tipBackground,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.textPrimary,
   },
   formInfo: {
     flexDirection: "row",
     alignItems: "flex-start",
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.tipBackground,
     padding: 12,
     borderRadius: 8,
     gap: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   formInfoText: {
     flex: 1,
     fontSize: 13,
-    color: "#6B7280",
+    color: Colors.textSecondary,
     lineHeight: 18,
   },
   modalActions: {
@@ -800,32 +838,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
+    borderTopColor: Colors.border,
   },
   cancelButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.tipBackground,
     alignItems: "center",
   },
   cancelButtonText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
-    color: "#6B7280",
+    color: Colors.textSecondary,
   },
   saveButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: "#3B82F6",
+    backgroundColor: Colors.primary,
     alignItems: "center",
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   saveButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "700",
     color: Colors.white,
   },
 });
