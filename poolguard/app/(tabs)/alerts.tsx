@@ -15,7 +15,6 @@ import {
   type AlertSeverity,
   type AppAlert,
 } from "@/utils/alertStore";
-import { sendEmergencyNotification } from "@/utils/notifications";
 
 export default function AlertsScreen() {
   const [alerts, setAlerts] = useState<AppAlert[]>(getAlerts);
@@ -74,7 +73,7 @@ export default function AlertsScreen() {
       {/* Test Notification Button */}
       <TouchableOpacity
         style={styles.testButton}
-        onPress={sendEmergencyNotification}
+        // onPress={}
         activeOpacity={0.8}
       >
         <Ionicons

@@ -98,7 +98,7 @@ def next_frame(image_input) -> FrameResult:
     while True:
         with _cache_lock:
             if frame_hash in _frame_cache:
-                print("⚡ Cache hit! Skipping cloud API request.")
+                # print("⚡ Cache hit! Skipping cloud API request.")
                 _frame_cache.move_to_end(frame_hash)
                 return _frame_cache[frame_hash]
 

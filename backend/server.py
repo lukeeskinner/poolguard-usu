@@ -58,14 +58,14 @@ def inference_loop():
                     _latest_result = result
                     _latest_frame_bytes = img_bytes
 
-                current_level = result.warningLevel
-                if _previous_warning_level is not None and current_level != _previous_warning_level:
-                    socketio.emit('risk_change', {
-                        'previous': _LEVEL_NAMES.get(_previous_warning_level),
-                        'current': _LEVEL_NAMES.get(current_level),
-                        'timestamp': time.time(),
-                    })
-                _previous_warning_level = current_level
+                    current_level = result.warningLevel
+                    if _previous_warning_level is not None and current_level != _previous_warning_level:
+                        socketio.emit('risk_change', {
+                            'previous': _LEVEL_NAMES.get(_previous_warning_level),
+                            'current': _LEVEL_NAMES.get(current_level),
+                            'timestamp': time.time(),
+                        })
+                    _previous_warning_level = current_level
 
             except Exception as e:
                 print(f"Inference error: {e}")

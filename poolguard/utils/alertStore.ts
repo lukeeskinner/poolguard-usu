@@ -30,11 +30,15 @@ export function addAlert(alert: Omit<AppAlert, "id" | "time">) {
     ...alert,
   };
   alerts = [newAlert, ...alerts];
-  listeners.forEach((l) => l());
+  
 
   // If it's an emergency, fire emergency listeners too
   if (alert.severity === "emergency") {
     emergencyListeners.forEach((l) => l());
+  }
+  else
+  {
+    listeners.forEach((l) => l());
   }
 }
 

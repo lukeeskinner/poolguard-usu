@@ -31,7 +31,7 @@ export default function RootLayout() {
     // Handle notification action buttons tapped from system tray
     notificationListener.current =
       Notifications.addNotificationReceivedListener(() => {
-        // No-op: in-app modal is handled by subscribeEmergency in alertStore
+
       });
 
     responseListener.current =
@@ -48,17 +48,7 @@ export default function RootLayout() {
 
     socket.on("risk_change", (data: { previous: string; current: string }) => {
       if (data.current === "high") {
-        const now = Date.now();
-        if (now - lastAlertTimeRef.current >= ALERT_COOLDOWN_MS) {
-          lastAlertTimeRef.current = now;
-          // addAlert fires subscribeEmergency → modal, and adds entry to alert history
-          addAlert({
-            severity: "emergency",
-            title: "🚨 Emergency: Possible Drowning Detected",
-            description:
-              "Emergency protocol initiated. Siren activated and emergency contacts notified.",
-          });
-        }
+
       }
     });
 

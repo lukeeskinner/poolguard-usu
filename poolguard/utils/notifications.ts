@@ -108,6 +108,7 @@ export async function sendLocalNotification(
   });
 }
 
+/*
 export function sendEmergencyNotification() {
   // Fires the in-app EmergencyAlertModal via the alert store (subscribeEmergency in _layout.tsx).
   // No system notification scheduled — the modal IS the alert when the app is open.
@@ -118,3 +119,4 @@ export function sendEmergencyNotification() {
       "Emergency protocol initiated. Siren activated and emergency contacts notified.",
   });
 }
+*/

@@ -7,10 +7,12 @@ import {
   Modal,
   Pressable,
 } from "react-native";
+
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { addAlert } from "@/utils/alertStore";
 
 interface CameraFeedCardProps {
   name: string;
@@ -83,7 +85,17 @@ export default function CameraFeedCard({
 
         if (data.warningLevel === 0) setRiskStatus("low");
         else if (data.warningLevel === 1) setRiskStatus("medium");
-        else if (data.warningLevel === 2) setRiskStatus("danger");
+        else if (data.warningLevel === 2) {
+          setRiskStatus("danger");
+          setTimeout(() => {
+            addAlert({
+              severity: "emergency",
+              title: "🚨 Emergency: Possible Drowning Detected",
+              description:
+                "Emergency protocol initiated. Siren activated and emergency contacts notified.",
+            });
+          }, 2000);
+        }
       } catch {
         // Keep last status if polling fails briefly.
       }
@@ -223,21 +235,23 @@ export default function CameraFeedCard({
           </TouchableOpacity>
         </View>
       </View>
-      <Modal
-        visible={isFullscreen}
-        animationType="fade"
-        transparent
-        onRequestClose={() => setIsFullscreen(false)}
-      >
-        <Pressable
-          style={styles.fullscreenBackdrop}
-          onPress={() => setIsFullscreen(false)}
+      {isFullscreen && (
+        <Modal
+          visible={isFullscreen}
+          animationType="fade"
+          transparent
+          onRequestClose={() => setIsFullscreen(false)}
         >
-          <Pressable style={styles.fullscreenContent} onPress={() => {}}>
-            {renderPreview(true)}
+          <Pressable
+            style={styles.fullscreenBackdrop}
+            onPress={() => setIsFullscreen(false)}
+          >
+            <Pressable style={styles.fullscreenContent} onPress={() => {}}>
+              {renderPreview(true)}
+            </Pressable>
           </Pressable>
-        </Pressable>
-      </Modal>
+        </Modal>
+      )}
     </>
   );
 }

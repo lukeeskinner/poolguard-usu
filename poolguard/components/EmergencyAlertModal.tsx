@@ -66,6 +66,8 @@ export default function EmergencyAlertModal({
   };
 
   return (
+    <>
+    {visible && (
     <Modal
       visible={visible}
       transparent
@@ -167,6 +169,8 @@ export default function EmergencyAlertModal({
         </Pressable>
       </Pressable>
     </Modal>
+    )}
+    </>
   );
 }
 
