@@ -42,7 +42,7 @@ export default function TabLayout() {
         name="home"
         options={{
           tabBarIcon: ({ color }) => (
-            <TabIcon name="videocam-outline" color={color} label="HOME" />
+            <TabIcon name="home-outline" color={color} label="HOME" />
           ),
           tabBarActiveTintColor: Colors.activeTab,
           tabBarInactiveTintColor: Colors.inactiveTab,

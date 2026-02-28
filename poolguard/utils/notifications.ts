@@ -2,6 +2,7 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
+import { addAlert } from "./alertStore";
 
 // Controls how notifications are shown when app is in foreground
 Notifications.setNotificationHandler({
@@ -90,6 +91,11 @@ export async function sendLocalNotification(
   body: string,
   data?: Record<string, unknown>,
 ) {
+  addAlert({
+    severity: "medium",
+    title,
+    description: body,
+  });
   await Notifications.scheduleNotificationAsync({
     content: {
       title,
@@ -103,6 +109,12 @@ export async function sendLocalNotification(
 }
 
 export async function sendEmergencyNotification() {
+  addAlert({
+    severity: "emergency",
+    title: "🚨 Emergency: Possible Drowning Detected",
+    description:
+      "Emergency protocol initiated. Siren activated and emergency contacts notified.",
+  });
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "🚨 Emergency: Possible Drowning Detected",

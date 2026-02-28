@@ -33,6 +33,9 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: Colors.textPrimary,
     letterSpacing: -0.3,
+    textAlign: "center",
+    justifyContent:"center",
+
   },
   badge: {
     flexDirection: "row",

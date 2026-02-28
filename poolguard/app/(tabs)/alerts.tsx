@@ -1,81 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  getAlerts,
+  subscribeAlerts,
+  type AlertSeverity,
+  type AppAlert,
+} from "@/utils/alertStore";
+import { sendEmergencyNotification } from "@/utils/notifications";
 
-type AlertSeverity = "emergency" | "high" | "medium" | "system";
 type FilterType = "all" | "highRisk" | "emergency";
-
-interface Alert {
-  id: string;
-  severity: AlertSeverity;
-  title: string;
-  time: string;
-  description: string;
-  action?: string;
-  actionIcon?: string;
-  image?: any;
-}
-
-const mockAlerts: Alert[] = [
-  {
-    id: "1",
-    severity: "emergency",
-    title: "Emergency",
-    time: "10:42 AM",
-    description:
-      "Drowning risk detected in deep end.\nImmediate action required.",
-    action: "View Live",
-    actionIcon: "call",
-    image: require("@/assets/images/react-logo.png"), // Placeholder
-  },
-  {
-    id: "2",
-    severity: "medium",
-    title: "Movement Alert",
-    time: "09:15 AM",
-    description: "Movement detected near edge.",
-    action: "Review Clip",
-    image: require("@/assets/images/react-logo.png"), // Placeholder
-  },
-  {
-    id: "3",
-    severity: "system",
-    title: "Scheduled Check",
-    time: "08:00 AM",
-    description: "AI system diagnostic complete. All sensors operational.",
-  },
-  {
-    id: "4",
-    severity: "medium",
-    title: "Fence Gate Opened",
-    time: "07:22 AM",
-    description: "Safety gate unlatched at north entrance.",
-    action: "Check Gate",
-    image: require("@/assets/images/react-logo.png"), // Placeholder
-  },
-];
 
 export default function AlertsScreen() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [alerts, setAlerts] = useState<AppAlert[]>(getAlerts);
+
+  useEffect(() => {
+    return subscribeAlerts(() => setAlerts([...getAlerts()]));
+  }, []);
 
   const getFilteredAlerts = () => {
-    if (activeFilter === "all") return mockAlerts;
+    if (activeFilter === "all") return alerts;
     if (activeFilter === "emergency")
-      return mockAlerts.filter((a) => a.severity === "emergency");
+      return alerts.filter((a) => a.severity === "emergency");
     if (activeFilter === "highRisk")
-      return mockAlerts.filter(
+      return alerts.filter(
         (a) => a.severity === "emergency" || a.severity === "high",
       );
-    return mockAlerts;
+    return alerts;
   };
 
   const getSeverityColor = (severity: AlertSeverity) => {
@@ -108,24 +68,18 @@ export default function AlertsScreen() {
     }
   };
 
+  const filtered = getFilteredAlerts();
+
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="chevron-back" size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
+        <View style={styles.headerButton} />
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>Alert History</Text>
           <Text style={styles.headerSubtitle}>PoolGuard AI • Home Pool</Text>
         </View>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons
-            name="chevron-forward"
-            size={24}
-            color={Colors.textPrimary}
-          />
-        </TouchableOpacity>
+        <View style={styles.headerButton} />
       </View>
 
       {/* Filter Tabs */}
@@ -180,102 +134,83 @@ export default function AlertsScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Test Notification Button */}
+      <TouchableOpacity
+        style={styles.testButton}
+        onPress={sendEmergencyNotification}
+        activeOpacity={0.8}
+      >
+        <Ionicons
+          name="warning"
+          size={18}
+          color="#fff"
+          style={{ marginRight: 8 }}
+        />
+        <Text style={styles.testButtonText}>Send Test Emergency Alert</Text>
+      </TouchableOpacity>
+
       {/* Alerts List */}
       <ScrollView style={styles.scrollView}>
-        {getFilteredAlerts().map((alert) => (
-          <View key={alert.id} style={styles.alertCard}>
-            <View style={styles.alertContent}>
-              <Text
-                style={[
-                  styles.severityLabel,
-                  { color: getSeverityColor(alert.severity) },
-                ]}
-              >
-                {getSeverityLabel(alert.severity)}
-              </Text>
-              <View style={styles.alertHeader}>
-                {alert.severity === "emergency" && (
-                  <View style={styles.emergencyIcon}>
-                    <Ionicons name="warning" size={16} color="#DC2626" />
-                  </View>
-                )}
+        {filtered.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons
+              name="shield-checkmark-outline"
+              size={48}
+              color="#9CA3AF"
+            />
+            <Text style={styles.emptyTitle}>No alerts yet</Text>
+            <Text style={styles.emptySubtitle}>
+              Alerts will appear here when PoolGuard detects activity.
+            </Text>
+          </View>
+        ) : (
+          filtered.map((alert) => (
+            <View key={alert.id} style={styles.alertCard}>
+              <View style={styles.alertContent}>
                 <Text
                   style={[
-                    styles.alertTitle,
+                    styles.severityLabel,
                     { color: getSeverityColor(alert.severity) },
                   ]}
                 >
-                  {alert.title}
+                  {getSeverityLabel(alert.severity)}
                 </Text>
-              </View>
-              <Text style={styles.alertTime}>
-                {alert.time} — {alert.description.split("\n")[0]}
-              </Text>
-              {alert.description.includes("\n") && (
-                <Text style={styles.alertDescription}>
-                  {alert.description.split("\n")[1]}
-                </Text>
-              )}
-              {alert.action && (
-                <TouchableOpacity
-                  style={[
-                    styles.actionButton,
-                    alert.severity === "emergency" && styles.actionButtonRed,
-                    alert.severity === "medium" && styles.actionButtonYellow,
-                  ]}
-                >
-                  {alert.actionIcon === "call" && (
-                    <Ionicons
-                      name="call"
-                      size={16}
-                      color="#fff"
-                      style={styles.actionButtonIcon}
-                    />
-                  )}
-                  {alert.action === "Review Clip" && (
-                    <Ionicons
-                      name="play-circle-outline"
-                      size={16}
-                      color="#92400E"
-                      style={styles.actionButtonIcon}
-                    />
-                  )}
-                  {alert.action === "Check Gate" && (
-                    <Ionicons
-                      name="eye-outline"
-                      size={16}
-                      color="#92400E"
-                      style={styles.actionButtonIcon}
-                    />
+                <View style={styles.alertHeader}>
+                  {alert.severity === "emergency" && (
+                    <View style={styles.emergencyIcon}>
+                      <Ionicons name="warning" size={16} color="#DC2626" />
+                    </View>
                   )}
                   <Text
                     style={[
-                      styles.actionButtonText,
-                      alert.severity === "emergency" &&
-                        styles.actionButtonTextWhite,
-                      alert.severity === "medium" &&
-                        styles.actionButtonTextDark,
+                      styles.alertTitle,
+                      { color: getSeverityColor(alert.severity) },
                     ]}
                   >
-                    {alert.action}
+                    {alert.title}
                   </Text>
-                </TouchableOpacity>
+                </View>
+                <Text style={styles.alertTime}>
+                  {alert.time} — {alert.description}
+                </Text>
+              </View>
+              {alert.severity === "system" && (
+                <View style={styles.systemIconContainer}>
+                  <Ionicons
+                    name="shield-checkmark-outline"
+                    size={40}
+                    color="#9CA3AF"
+                  />
+                </View>
+              )}
+              {alert.severity === "emergency" && (
+                <View style={styles.systemIconContainer}>
+                  <Ionicons name="warning" size={40} color="#DC2626" />
+                </View>
               )}
             </View>
-            {alert.image && (
-              <Image source={alert.image} style={styles.alertImage} />
-            )}
-            {!alert.image && alert.severity === "system" && (
-              <View style={styles.systemIconContainer}>
-                <Ionicons
-                  name="shield-checkmark-outline"
-                  size={40}
-                  color="#9CA3AF"
-                />
-              </View>
-            )}
-          </View>
-        ))}
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -427,5 +362,40 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.tipBackground,
     justifyContent: "center",
     alignItems: "center",
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 80,
+    paddingHorizontal: 32,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: Colors.textPrimary,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  testButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#DC2626",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  testButtonText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "700",
   },
 });

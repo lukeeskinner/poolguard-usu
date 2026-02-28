@@ -16,9 +16,7 @@ export default function ScreenHeader({
 }: ScreenHeaderProps) {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} activeOpacity={0.7}>
-        <Ionicons name="chevron-back" size={22} color={Colors.textPrimary} />
-      </TouchableOpacity>
+      <View style={styles.backButton} />
 
       <View style={styles.titleBlock}>
         {showMiraLogo ? (
