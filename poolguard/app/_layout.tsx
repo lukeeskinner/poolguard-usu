@@ -20,7 +20,7 @@ export default function RootLayout() {
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const lastAlertTimeRef = useRef<number>(0);
-  const ALERT_COOLDOWN_MS = 60_000; // 1 minute between drowning alerts
+  const ALERT_COOLDOWN_MS = 120_000; // 2 minutes between drowning alerts
 
   useEffect(() => {
     registerForPushNotifications();
