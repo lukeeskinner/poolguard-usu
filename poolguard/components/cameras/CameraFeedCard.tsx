@@ -1,18 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-} from "react-native";
-
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { addAlert } from "@/utils/alertStore";
+import { subscribeEmergency } from "@/utils/alertStore";
+import EmergencyAlertModal from "@/components/EmergencyAlertModal";
 
 interface CameraFeedCardProps {
   name: string;
@@ -42,6 +35,26 @@ export default function CameraFeedCard({
   const [loadingUri, setLoadingUri] = useState<string | null>(null);
   const [riskStatus, setRiskStatus] = useState<RiskStatus>("unknown");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [fsAlertVisible, setFsAlertVisible] = useState(false);
+  const isFullscreenRef = useRef(false);
+
+  // Keep ref in sync; clear alert overlay when leaving fullscreen
+  useEffect(() => {
+    isFullscreenRef.current = isFullscreen;
+    if (!isFullscreen) setFsAlertVisible(false);
+  }, [isFullscreen]);
+
+  // Only show the alert when the user is already in fullscreen
+  useEffect(() => {
+    return subscribeEmergency(() => {
+      setTimeout(() => {
+        // Re-check ref at the moment the timer fires — user may have exited fullscreen
+        if (isFullscreenRef.current) {
+          setFsAlertVisible(true);
+        }
+      }, 1000);
+    });
+  }, []);
 
   const activeRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -235,23 +248,20 @@ export default function CameraFeedCard({
           </TouchableOpacity>
         </View>
       </View>
-      {isFullscreen && (
-        <Modal
-          visible={isFullscreen}
-          animationType="fade"
-          transparent
-          onRequestClose={() => setIsFullscreen(false)}
-        >
-          <Pressable
-            style={styles.fullscreenBackdrop}
-            onPress={() => setIsFullscreen(false)}
-          >
-            <Pressable style={styles.fullscreenContent} onPress={() => {}}>
-              {renderPreview(true)}
-            </Pressable>
-          </Pressable>
-        </Modal>
-      )}
+      <Modal
+        visible={isFullscreen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => {
+          if (!fsAlertVisible) setIsFullscreen(false);
+        }}
+      >
+        <View style={styles.fullscreenBackdrop}>{renderPreview(true)}</View>
+        <EmergencyAlertModal
+          visible={fsAlertVisible}
+          onDismiss={() => setFsAlertVisible(false)}
+        />
+      </Modal>
     </>
   );
 }
@@ -393,9 +403,6 @@ const styles = StyleSheet.create({
   },
   fullscreenBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.95)",
-  },
-  fullscreenContent: {
-    flex: 1,
+    backgroundColor: "#000000",
   },
 });

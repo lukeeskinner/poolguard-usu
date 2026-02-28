@@ -65,7 +65,7 @@ export default function AlertsScreen() {
         <View style={styles.headerButton} />
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>Alert History</Text>
-          <Text style={styles.headerSubtitle}>PoolGuard AI • Home Pool</Text>
+          <Text style={styles.headerSubtitle}>Mira • Home Pool</Text>
         </View>
         <View style={styles.headerButton} />
       </View>
@@ -96,7 +96,7 @@ export default function AlertsScreen() {
             />
             <Text style={styles.emptyTitle}>No alerts yet</Text>
             <Text style={styles.emptySubtitle}>
-              Alerts will appear here when PoolGuard detects activity.
+              Alerts will appear here when Mira detects activity.
             </Text>
           </View>
         ) : (

@@ -20,13 +20,15 @@ export default function RootLayout() {
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const lastAlertTimeRef = useRef<number>(0);
-  const ALERT_COOLDOWN_MS = 120_000; // 2 minutes between drowning alerts
+  const ALERT_COOLDOWN_MS = 60_000; // 1 minute between drowning alerts
 
   useEffect(() => {
     registerForPushNotifications();
     registerNotificationCategories();
 
-    const unsubEmergency = subscribeEmergency(() => setAlertVisible(true));
+    const unsubEmergency = subscribeEmergency(() => {
+      setTimeout(() => setAlertVisible(true), 500);
+    });
 
     // Handle notification action buttons tapped from system tray
     notificationListener.current =
@@ -48,7 +50,17 @@ export default function RootLayout() {
 
     socket.on("risk_change", (data: { previous: string; current: string }) => {
       if (data.current === "high") {
-
+        const now = Date.now();
+        if (now - lastAlertTimeRef.current >= ALERT_COOLDOWN_MS) {
+          lastAlertTimeRef.current = now;
+          // addAlert fires subscribeEmergency → modal, and adds entry to alert history
+          addAlert({
+            severity: "emergency",
+            title: "Emergency: Possible Drowning Detected",
+            description:
+              "Emergency protocol initiated. Siren activated and emergency contacts notified.",
+          });
+        }
       }
     });
 

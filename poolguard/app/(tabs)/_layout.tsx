@@ -56,7 +56,7 @@ export default function TabLayout() {
               name="notifications-outline"
               color={color}
               label="ALERTS"
-              badge={3}
+              badge={1}
             />
           ),
           tabBarActiveTintColor: Colors.activeTab,

@@ -34,7 +34,10 @@ export function addAlert(alert: Omit<AppAlert, "id" | "time">) {
 
   // If it's an emergency, fire emergency listeners too
   if (alert.severity === "emergency") {
-    emergencyListeners.forEach((l) => l());
+    // Delay emergency modal trigger so UI (like High Risk label) can render first on mobile
+    setTimeout(() => {
+      emergencyListeners.forEach((l) => l());
+    }, 100);
   }
   else
   {

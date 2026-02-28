@@ -44,14 +44,13 @@ export default function CamerasScreen() {
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <View style={styles.container}>
         <ScreenHeader
-          title="PoolGuard AI"
+          title="Mira"
           subtitle="Camera Management"
           showMiraLogo
         />
         <View style={styles.content}>
-          <LiveFeedHeader
-            activeCount={CAMERAS.filter((c) => c.isLive).length}
-          />
+         <LiveFeedHeader activeCount={CAMERAS.filter(c => c.isLive).length} />
+
 
           {/* Camera name above the feed */}
           <View style={styles.cameraNameRow}>
