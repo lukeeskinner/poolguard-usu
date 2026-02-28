@@ -13,7 +13,7 @@ def makeAPICall(video_path, prompt):
     video_file = client.files.upload(file=video_path)
 
     while video_file.state.name == "PROCESSING":
-        time.sleep(2)
+        time.sleep(1)
         video_file = client.files.get(name=video_file.name)
 
     if video_file.state.name == "FAILED":
@@ -31,15 +31,3 @@ def makeAPICall(video_path, prompt):
 
     return result
 
-
-if __name__ == "__main__":
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    video_path = os.path.join(script_dir, "test.mp4")
-    prompt_path = os.path.join(script_dir, "masterprompt.txt")
-
-    with open(prompt_path, "r") as f:
-        prompt = f.read()
-
-    result = makeAPICall(video_path, prompt)
-    print(result)
